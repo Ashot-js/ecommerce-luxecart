@@ -1,0 +1,550 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+// ============================================================
+// HOME PAGE
+// ============================================================
+
+// ---- HERO ----
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 90vh;
+  padding: $space-20 $space-4;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 30% 50%, rgba($color-burgundy, 0.25) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 30%, rgba($color-burgundy-dark, 0.3) 0%, transparent 55%),
+    $color-bg-primary;
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba($color-bg-primary, 0.4) 0%, transparent 40%, rgba($color-bg-primary, 0.95) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  &__content {
+    position: relative;
+    z-index: 2;
+    max-width: 720px;
+    text-align: center;
+  }
+
+  &__accent {
+    width: 80px;
+    height: 3px;
+    background: $color-burgundy-glow;
+    margin: 0 auto $space-8;
+    border-radius: $radius-full;
+    box-shadow: 0 0 12px rgba($color-burgundy-glow, 0.5);
+  }
+
+  &__heading {
+    font-family: $font-display;
+    font-size: clamp(2.25rem, 5vw, $fs-5xl);
+    font-weight: $fw-bold;
+    color: $color-text-primary;
+    line-height: 1.15;
+    margin: 0 0 $space-6;
+    letter-spacing: -0.02em;
+
+    @include md {
+      letter-spacing: -0.03em;
+    }
+  }
+
+  &__subtext {
+    font-family: $font-body;
+    font-size: clamp($fs-base, 1.5vw, $fs-lg);
+    color: $color-text-secondary;
+    line-height: $line-height-relaxed;
+    margin: 0 auto $space-10;
+    max-width: 540px;
+  }
+
+  &__cta {
+    @include btn-primary;
+    padding: $space-4 $space-10;
+    font-size: $fs-md;
+    gap: $space-2;
+    border-radius: $radius-xl;
+    box-shadow: 0 4px 20px rgba($color-burgundy, 0.35);
+
+    &:hover {
+      box-shadow: 0 6px 28px rgba($color-burgundy, 0.5);
+    }
+  }
+
+  &__scroll-indicator {
+    position: absolute;
+    bottom: $space-8;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    color: $color-text-muted;
+    font-size: $fs-xl;
+    opacity: 0.6;
+    user-select: none;
+  }
+}
+
+// ============================================================
+// FEATURED PRODUCTS
+// ============================================================
+.featured {
+  padding: $space-20 0 $space-24;
+
+  &__container {
+    @include container;
+  }
+
+  &__header {
+    text-align: center;
+    margin-bottom: $space-12;
+  }
+
+  &__title {
+    font-family: $font-display;
+    font-size: clamp($fs-2xl, 3vw, $fs-3xl);
+    font-weight: $fw-bold;
+    color: $color-text-primary;
+    margin: 0 0 $space-4;
+  }
+
+  &__divider {
+    display: flex;
+    justify-content: center;
+    margin-bottom: $space-5;
+
+    &-accent {
+      display: block;
+      width: 60px;
+      height: 2px;
+      background: $color-burgundy-glow;
+      border-radius: $radius-full;
+      box-shadow: 0 0 8px rgba($color-burgundy-glow, 0.4);
+    }
+  }
+
+  &__subtitle {
+    font-family: $font-body;
+    font-size: $fs-md;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $space-6;
+
+    @include sm {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include lg {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  &__error {
+    text-align: center;
+    padding: $space-12 $space-4;
+    color: $color-error;
+    font-size: $fs-base;
+    background: rgba($color-error, 0.08);
+    border: 1px solid rgba($color-error, 0.2);
+    border-radius: $radius-md;
+  }
+
+  &__empty {
+    text-align: center;
+    padding: $space-12 $space-4;
+    color: $color-text-muted;
+    font-size: $fs-md;
+  }
+
+  &__more {
+    text-align: center;
+    margin-top: $space-12;
+
+    &-link {
+      display: inline-flex;
+      align-items: center;
+      gap: $space-2;
+      font-family: $font-body;
+      font-size: $fs-md;
+      font-weight: $fw-medium;
+      color: $color-burgundy-light;
+      text-decoration: none;
+      transition: color $transition-fast, gap $transition-fast;
+
+      &:hover {
+        color: $color-burgundy-glow;
+        gap: $space-3;
+      }
+    }
+  }
+}
+
+// ============================================================
+// PRODUCT CARD
+// ============================================================
+.product-card {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  border-radius: $radius-xl;
+
+  &--skeleton {
+    pointer-events: none;
+  }
+
+  // ---- Image ----
+  &__image-wrap {
+    position: relative;
+    display: block;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: $color-bg-secondary;
+    text-decoration: none;
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s $transition-spring;
+  }
+
+  &__image-wrap:hover &__image {
+    transform: scale(1.08);
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      transparent 55%,
+      rgba($color-bg-primary, 0.75) 100%
+    );
+    opacity: 0;
+    transition: opacity $transition-base;
+    pointer-events: none;
+  }
+
+  &:hover &__overlay {
+    opacity: 1;
+  }
+
+  &__badge {
+    position: absolute;
+    top: $space-3;
+    left: $space-3;
+    padding: $space-1 $space-3;
+    background: rgba($color-burgundy, 0.85);
+    backdrop-filter: blur(6px);
+    color: $color-text-primary;
+    font-family: $font-body;
+    font-size: $fs-xs;
+    font-weight: $fw-medium;
+    border-radius: $radius-full;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    z-index: 2;
+  }
+
+  // ---- Body ----
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+    padding: $space-4 $space-4 $space-5;
+    flex: 1;
+  }
+
+  &__stars {
+    display: inline-flex;
+    gap: 1px;
+  }
+
+  &__star {
+    color: $color-text-muted;
+    fill: none;
+    transition: color $transition-fast;
+
+    &--filled {
+      color: $color-warning;
+      fill: $color-warning;
+    }
+  }
+
+  &__name {
+    font-family: $font-body;
+    font-size: $fs-sm;
+    font-weight: $fw-medium;
+    color: $color-text-primary;
+    text-decoration: none;
+    line-height: $line-height-tight;
+    @include text-truncate(2);
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $color-burgundy-light;
+    }
+  }
+
+  &__pricing {
+    display: flex;
+    align-items: baseline;
+    gap: $space-2;
+    margin-top: auto;
+  }
+
+  &__price {
+    font-family: $font-body;
+    font-size: $fs-md;
+    font-weight: $fw-semibold;
+    color: $color-text-primary;
+  }
+
+  &__compare-price {
+    font-family: $font-body;
+    font-size: $fs-sm;
+    color: $color-text-muted;
+    text-decoration: line-through;
+  }
+
+  // ---- Add to Cart ----
+  &__cart-btn {
+    @include btn-primary;
+    width: 100%;
+    padding: $space-2 $space-4;
+    font-size: $fs-sm;
+    border-radius: $radius-md;
+    margin-top: $space-2;
+
+    &:disabled {
+      @include gradient-burgundy;
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+
+  // ---- Skeleton ----
+  &__skeleton-img {
+    @include skeleton;
+    aspect-ratio: 1 / 1;
+    width: 100%;
+  }
+
+  &__skeleton-body {
+    padding: $space-4;
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+  }
+
+  &__skeleton-line {
+    @include skeleton;
+    height: 14px;
+    width: 100%;
+    border-radius: $radius-sm;
+
+    &--short {
+      width: 55%;
+    }
+  }
+
+  // ---- Hover Glow ----
+  &:hover {
+    box-shadow: 0 0 28px rgba($color-burgundy, 0.25), 0 8px 32px rgba(0, 0, 0, 0.5);
+    border-color: rgba($color-burgundy, 0.4);
+  }
+}
+
+// ============================================================
+// CATEGORIES
+// ============================================================
+.categories {
+  padding: 0 0 $space-24;
+
+  &__container {
+    @include container;
+  }
+
+  &__header {
+    text-align: center;
+    margin-bottom: $space-12;
+  }
+
+  &__title {
+    font-family: $font-display;
+    font-size: clamp($fs-2xl, 3vw, $fs-3xl);
+    font-weight: $fw-bold;
+    color: $color-text-primary;
+    margin: 0 0 $space-4;
+  }
+
+  &__divider {
+    display: flex;
+    justify-content: center;
+
+    &-accent {
+      display: block;
+      width: 60px;
+      height: 2px;
+      background: $color-burgundy-glow;
+      border-radius: $radius-full;
+      box-shadow: 0 0 8px rgba($color-burgundy-glow, 0.4);
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $space-6;
+
+    @include sm {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include lg {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  &__empty {
+    text-align: center;
+    padding: $space-12 $space-4;
+    color: $color-text-muted;
+    font-size: $fs-md;
+  }
+}
+
+// ============================================================
+// CATEGORY CARD
+// ============================================================
+.category-card {
+  @include card;
+  border-radius: $radius-xl;
+  min-height: 220px;
+
+  &--skeleton {
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: $space-6;
+  }
+
+  &__link {
+    position: relative;
+    display: block;
+    height: 100%;
+    min-height: 220px;
+    text-decoration: none;
+    overflow: hidden;
+    border-radius: $radius-xl;
+  }
+
+  &__bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.6s ease;
+  }
+
+  &__link:hover &__bg {
+    transform: scale(1.06);
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba($color-bg-primary, 0.25) 0%,
+      rgba($color-bg-primary, 0.7) 60%,
+      rgba($color-bg-primary, 0.92) 100%
+    );
+    transition: background $transition-base;
+  }
+
+  &__link:hover &__overlay {
+    background: linear-gradient(
+      180deg,
+      rgba($color-burgundy-dark, 0.3) 0%,
+      rgba($color-burgundy-dark, 0.65) 60%,
+      rgba($color-burgundy-dark, 0.9) 100%
+    );
+  }
+
+  &__content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    min-height: 220px;
+    padding: $space-6;
+  }
+
+  &__name {
+    font-family: $font-display;
+    font-size: $fs-xl;
+    font-weight: $fw-semibold;
+    color: $color-text-primary;
+    margin: 0 0 $space-2;
+  }
+
+  &__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-1;
+    font-family: $font-body;
+    font-size: $fs-sm;
+    font-weight: $fw-medium;
+    color: $color-burgundy-light;
+    transition: color $transition-fast, gap $transition-fast;
+  }
+
+  &__link:hover &__cta {
+    color: $color-burgundy-glow;
+    gap: $space-2;
+  }
+
+  // ---- Skeleton ----
+  &__skeleton-bg {
+    @include skeleton;
+    position: absolute;
+    inset: 0;
+    border-radius: $radius-xl;
+  }
+
+  &__skeleton-line {
+    @include skeleton;
+    position: relative;
+    z-index: 2;
+    height: 18px;
+    width: 60%;
+    border-radius: $radius-sm;
+  }
+
+  // ---- Hover Glow ----
+  &:hover {
+    box-shadow: 0 0 32px rgba($color-burgundy, 0.22), 0 12px 40px rgba(0, 0, 0, 0.55);
+    border-color: rgba($color-burgundy, 0.4);
+  }
+}

@@ -1,0 +1,279 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.products-page {
+  &__header {
+    padding: $space-12 0 $space-8;
+    text-align: center;
+    background: linear-gradient(180deg, rgba($color-burgundy, 0.08) 0%, transparent 100%);
+  }
+
+  &__title {
+    font-size: $fs-3xl;
+    margin-bottom: $space-4;
+  }
+
+  &__subtitle {
+    color: $color-text-muted;
+    font-size: $fs-md;
+  }
+
+  &__clear-filters {
+    @include btn-outline;
+    padding: $space-1 $space-3;
+    font-size: $fs-xs;
+    margin-top: $space-3;
+  }
+
+  // Toolbar
+  &__toolbar {
+    display: flex;
+    gap: $space-3;
+    padding: $space-4 0;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-2 $space-3;
+    background: $color-bg-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    flex: 1;
+    min-width: 200px;
+
+    svg { color: $color-text-muted; flex-shrink: 0; }
+
+    input {
+      flex: 1;
+      background: none;
+      border: none;
+      color: $color-text-primary;
+      font-size: $fs-sm;
+      font-family: $font-body;
+      outline: none;
+    }
+  }
+
+  &__filter-toggle {
+    @include btn-outline;
+    padding: $space-2 $space-3;
+    font-size: $fs-sm;
+  }
+
+  &__sort {
+    padding: $space-2 $space-3;
+    background: $color-bg-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    color: $color-text-primary;
+    font-size: $fs-sm;
+    font-family: $font-body;
+    outline: none;
+    cursor: pointer;
+
+    &:focus { border-color: $color-burgundy; }
+  }
+
+  // Body layout
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: $space-6;
+  }
+
+  // Filters panel
+  &__filters {
+    background: $color-bg-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    padding: $space-4;
+    overflow: hidden;
+  }
+
+  &__filter-heading {
+    font-family: $font-body;
+    font-size: $fs-sm;
+    font-weight: $fw-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: $space-3;
+    color: $color-text-muted;
+  }
+
+  &__filter-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+
+  &__filter-btn {
+    padding: $space-1 $space-3;
+    background: none;
+    border: 1px solid $color-border;
+    border-radius: $radius-full;
+    color: $color-text-secondary;
+    font-size: $fs-xs;
+    font-family: $font-body;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover { border-color: $color-burgundy; color: $color-text-primary; }
+    &--active { background: $color-burgundy; border-color: $color-burgundy; color: white; }
+  }
+
+  // Grid
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-4;
+
+    @media (min-width: $bp-sm) { grid-template-columns: repeat(2, 1fr); gap: $space-6; }
+    @media (min-width: $bp-md) { grid-template-columns: repeat(3, 1fr); }
+    @media (min-width: $bp-lg) { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  &__loading, &__error, &__empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: $space-16 0;
+    color: $color-text-muted;
+    font-size: $fs-md;
+
+    button {
+      @include btn-outline;
+      margin-top: $space-4;
+    }
+  }
+
+  // Pagination
+  &__pagination {
+    display: flex;
+    justify-content: center;
+    gap: $space-2;
+    padding: $space-8 0;
+  }
+
+  &__page-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $color-bg-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    color: $color-text-secondary;
+    font-size: $fs-sm;
+    font-family: $font-body;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover { border-color: $color-burgundy; color: $color-text-primary; }
+    &--active { background: $color-burgundy; border-color: $color-burgundy; color: white; }
+  }
+}
+
+// Product Card (shared between Products and Home)
+.product-card {
+  @include card;
+  display: flex;
+  flex-direction: column;
+
+  &__image-wrap {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1;
+    background: $color-bg-surface;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform $transition-slow;
+
+    .product-card:hover & { transform: scale(1.05); }
+  }
+
+  &__sale-badge {
+    position: absolute;
+    top: $space-2;
+    left: $space-2;
+    padding: $space-1 $space-2;
+    background: $color-burgundy;
+    color: white;
+    font-size: $fs-xs;
+    font-weight: $fw-semibold;
+    border-radius: $radius-sm;
+  }
+
+  &__body {
+    padding: $space-4;
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    flex: 1;
+  }
+
+  &__category {
+    font-size: $fs-xs;
+    color: $color-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    &:hover { color: $color-burgundy-light; }
+  }
+
+  &__name {
+    font-size: $fs-sm;
+    font-weight: $fw-semibold;
+    color: $color-text-primary;
+    text-decoration: none;
+    @include text-truncate(2);
+    line-height: 1.4;
+    &:hover { color: $color-burgundy-light; }
+  }
+
+  &__rating {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+
+    span {
+      font-size: $fs-xs;
+      color: $color-text-muted;
+      margin-left: 4px;
+    }
+  }
+
+  &__price {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    margin-top: auto;
+  }
+
+  &__price-current {
+    font-size: $fs-md;
+    font-weight: $fw-bold;
+    color: $color-text-primary;
+  }
+
+  &__price-compare {
+    font-size: $fs-sm;
+    color: $color-text-muted;
+    text-decoration: line-through;
+  }
+
+  &__add-btn {
+    @include btn-primary;
+    width: 100%;
+    padding: $space-2;
+    font-size: $fs-sm;
+    margin-top: $space-2;
+  }
+}

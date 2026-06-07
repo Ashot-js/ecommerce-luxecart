@@ -1,0 +1,245 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// ============================================================
+// Admin Layout — Sidebar + Main Content
+// ============================================================
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: $color-bg-primary;
+
+  // ---- Overlay (mobile) ----
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: $z-sticky;
+    backdrop-filter: blur(2px);
+  }
+
+  // ---- Sidebar ----
+  &__sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: $sidebar-width;
+    z-index: $z-sticky + 1;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, $color-burgundy-dark 0%, $color-burgundy 40%, $color-burgundy-dark 100%);
+    border-right: 1px solid rgba($color-burgundy-light, 0.25);
+    transform: translateX(-100%);
+    transition: transform $transition-base;
+
+    @include md {
+      position: sticky;
+      transform: translateX(0);
+    }
+
+    &--open {
+      transform: translateX(0);
+    }
+  }
+
+  &__sidebar-header {
+    @include flex-between;
+    padding: $space-6 $space-5;
+    border-bottom: 1px solid rgba($color-text-primary, 0.1);
+  }
+
+  &__logo {
+    font-family: $font-display;
+    font-size: $fs-xl;
+    color: $color-text-primary;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+
+  &__logo-badge {
+    font-size: $fs-xs;
+    font-weight: $fw-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    background: rgba($color-text-primary, 0.15);
+    color: $color-text-primary;
+    padding: $space-1 $space-2;
+    border-radius: $radius-full;
+    margin-left: auto;
+    margin-right: $space-3;
+  }
+
+  &__sidebar-close {
+    @include flex-center;
+    background: none;
+    border: none;
+    color: $color-text-secondary;
+    cursor: pointer;
+    padding: $space-1;
+    border-radius: $radius-sm;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $color-text-primary;
+    }
+
+    @include md {
+      display: none;
+    }
+  }
+
+  // ---- Navigation ----
+  &__nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: $space-4 $space-3;
+    gap: $space-1;
+    overflow-y: auto;
+  }
+
+  &__nav-link {
+    @include flex-between;
+    padding: $space-3 $space-4;
+    border-radius: $radius-md;
+    color: rgba($color-text-primary, 0.7);
+    text-decoration: none;
+    font-size: $fs-sm;
+    font-weight: $fw-medium;
+    transition: all $transition-fast;
+    gap: $space-3;
+
+    svg:first-child {
+      flex-shrink: 0;
+    }
+
+    span {
+      flex: 1;
+    }
+
+    &:hover {
+      background: rgba($color-text-primary, 0.08);
+      color: $color-text-primary;
+    }
+
+    &--active {
+      background: rgba($color-text-primary, 0.15);
+      color: $color-text-primary;
+
+      .admin-layout__nav-arrow {
+        opacity: 1;
+      }
+    }
+  }
+
+  &__nav-arrow {
+    opacity: 0;
+    transition: opacity $transition-fast;
+    color: $color-burgundy-glow;
+  }
+
+  // ---- Footer ----
+  &__sidebar-footer {
+    padding: $space-4 $space-3;
+    border-top: 1px solid rgba($color-text-primary, 0.1);
+  }
+
+  &__back-btn {
+    @include btn-ghost;
+    width: 100%;
+    justify-content: flex-start;
+    color: rgba($color-text-primary, 0.6);
+    font-size: $fs-sm;
+    padding: $space-3 $space-4;
+
+    &:hover {
+      background: rgba($color-text-primary, 0.08);
+      color: $color-text-primary;
+    }
+  }
+
+  // ---- Main Area ----
+  &__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  // ---- Top Bar ----
+  &__topbar {
+    @include flex-between;
+    position: sticky;
+    top: 0;
+    z-index: $z-sticky - 1;
+    padding: $space-4 $space-5;
+    background: rgba($color-bg-secondary, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid $color-border;
+
+    @include md {
+      padding: $space-4 $space-8;
+    }
+  }
+
+  &__hamburger {
+    @include flex-center;
+    background: none;
+    border: none;
+    color: $color-text-primary;
+    cursor: pointer;
+    padding: $space-1;
+    border-radius: $radius-sm;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $color-burgundy-light;
+    }
+
+    @include md {
+      display: none;
+    }
+  }
+
+  &__title {
+    font-family: $font-display;
+    font-size: $fs-lg;
+    color: $color-text-primary;
+    margin: 0;
+
+    @include md {
+      font-size: $fs-xl;
+    }
+  }
+
+  &__store-link {
+    display: none;
+    align-items: center;
+    gap: $space-2;
+    color: $color-text-secondary;
+    font-size: $fs-sm;
+    text-decoration: none;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $color-burgundy-light;
+    }
+
+    @include md {
+      display: flex;
+    }
+  }
+
+  // ---- Content ----
+  &__content {
+    flex: 1;
+    padding: $space-6 $space-4;
+
+    @include md {
+      padding: $space-8;
+    }
+  }
+}

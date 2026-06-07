@@ -1,0 +1,181 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.admin-products {
+  &__toolbar {
+    display: flex;
+    gap: $space-3;
+    margin-bottom: $space-6;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-2 $space-3;
+    background: $color-bg-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    flex: 1;
+    max-width: 300px;
+
+    svg { color: $color-text-muted; }
+    input {
+      background: none; border: none; color: $color-text-primary;
+      font-size: $fs-sm; font-family: $font-body; outline: none; width: 100%;
+    }
+  }
+
+  &__add-btn {
+    @include btn-primary;
+    padding: $space-2 $space-4;
+    font-size: $fs-sm;
+  }
+
+  // Inline form
+  &__form {
+    background: $color-bg-card;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    padding: $space-4;
+    margin-bottom: $space-4;
+    overflow: hidden;
+
+    h3 { font-family: $font-body; font-size: $fs-md; margin-bottom: $space-3; }
+  }
+
+  &__form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-3;
+    margin-bottom: $space-3;
+
+    input {
+      @include input-base;
+    }
+  }
+
+  &__form-actions {
+    display: flex;
+    gap: $space-2;
+
+    button {
+      @include btn-base;
+      padding: $space-2 $space-4;
+      font-size: $fs-sm;
+      gap: $space-1;
+
+      &:first-child { @include gradient-burgundy; color: white; }
+      &:last-child { background: $color-bg-surface; color: $color-text-secondary; border: 1px solid $color-border; }
+    }
+  }
+
+  // Table
+  &__table-wrap {
+    overflow-x: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $fs-sm;
+
+    th {
+      text-align: left;
+      padding: $space-3 $space-4;
+      font-size: $fs-xs;
+      font-weight: $fw-semibold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: $color-text-muted;
+      border-bottom: 1px solid $color-border;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: $space-3 $space-4;
+      border-bottom: 1px solid $color-border;
+      color: $color-text-secondary;
+      vertical-align: middle;
+
+      input {
+        @include input-base;
+        padding: $space-1 $space-2;
+        font-size: $fs-sm;
+      }
+    }
+
+    tbody tr {
+      transition: background $transition-fast;
+
+      &:hover { background: rgba($color-text-primary, 0.02); }
+    }
+  }
+
+  &__prod-name {
+    font-weight: $fw-medium;
+    color: $color-text-primary;
+  }
+
+  &__price {
+    &-old {
+      text-decoration: line-through;
+      color: $color-text-muted;
+      font-size: $fs-xs;
+      margin-left: $space-2;
+    }
+  }
+
+  &__edit-price {
+    display: flex;
+    gap: $space-2;
+    input { width: 80px; }
+  }
+
+  &__stock {
+    font-weight: $fw-semibold;
+    &--low { color: $color-warning; }
+  }
+
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-1;
+    padding: $space-1 $space-2;
+    border-radius: $radius-full;
+    border: 1px solid $color-border;
+    font-size: $fs-xs;
+    font-family: $font-body;
+    cursor: pointer;
+    background: none;
+    color: $color-text-muted;
+
+    &--active {
+      border-color: $color-success;
+      color: $color-success;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: $space-1;
+  }
+
+  &__action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    background: none;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    color: $color-text-muted;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover { border-color: $color-burgundy; color: $color-text-primary; }
+    &--save { background: $color-burgundy; border-color: $color-burgundy; color: white; &:hover { opacity: 0.9; } }
+  }
+}

@@ -1,0 +1,227 @@
+// ============================================================
+// LuxeCart Design System — Mixins
+// ============================================================
+@use 'variables' as *;
+
+// ---- Responsive Breakpoints ----
+@mixin sm {
+  @media (min-width: $bp-sm) { @content; }
+}
+
+@mixin md {
+  @media (min-width: $bp-md) { @content; }
+}
+
+@mixin lg {
+  @media (min-width: $bp-lg) { @content; }
+}
+
+@mixin xl {
+  @media (min-width: $bp-xl) { @content; }
+}
+
+// ---- Flex Utilities ----
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// ---- Glass Morphism ----
+@mixin glass {
+  background: rgba($color-bg-surface, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba($color-burgundy, 0.15);
+}
+
+@mixin glass-strong {
+  background: rgba($color-bg-elevated, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba($color-burgundy, 0.2);
+}
+
+// ---- Burgundy Gradient ----
+@mixin gradient-burgundy {
+  background: linear-gradient(135deg, $color-burgundy 0%, $color-burgundy-dark 100%);
+}
+
+@mixin gradient-burgundy-horizontal {
+  background: linear-gradient(90deg, $color-burgundy-dark 0%, $color-burgundy 50%, $color-burgundy-light 100%);
+}
+
+@mixin gradient-text {
+  background: linear-gradient(135deg, $color-burgundy-light, $color-burgundy-glow);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+// ---- Card Base ----
+@mixin card {
+  background: $color-bg-card;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  transition: border-color $transition-base, box-shadow $transition-base;
+
+  &:hover {
+    border-color: rgba($color-burgundy, 0.3);
+    box-shadow: $shadow-glow;
+  }
+}
+
+// ---- Input Base ----
+@mixin input-base {
+  width: 100%;
+  padding: $space-3 $space-4;
+  background: $color-bg-secondary;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  color: $color-text-primary;
+  font-family: $font-body;
+  font-size: $fs-base;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+  outline: none;
+
+  &::placeholder {
+    color: $color-text-muted;
+  }
+
+  &:focus {
+    border-color: $color-burgundy;
+    box-shadow: 0 0 0 3px $color-focus-ring;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ---- Button Base ----
+@mixin btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  padding: $space-3 $space-6;
+  border: none;
+  border-radius: $radius-md;
+  font-family: $font-body;
+  font-size: $fs-base;
+  font-weight: $fw-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+  text-decoration: none;
+  line-height: 1;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-burgundy-glow;
+    outline-offset: 2px;
+  }
+}
+
+@mixin btn-primary {
+  @include btn-base;
+  @include gradient-burgundy;
+  color: $color-text-primary;
+
+  &:hover:not(:disabled) {
+    box-shadow: $shadow-glow;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+@mixin btn-outline {
+  @include btn-base;
+  background: transparent;
+  color: $color-text-primary;
+  border: 1px solid $color-border-light;
+
+  &:hover:not(:disabled) {
+    border-color: $color-burgundy;
+    color: $color-burgundy-light;
+    background: rgba($color-burgundy, 0.05);
+  }
+}
+
+@mixin btn-ghost {
+  @include btn-base;
+  background: transparent;
+  color: $color-text-secondary;
+
+  &:hover:not(:disabled) {
+    background: rgba($color-text-primary, 0.05);
+    color: $color-text-primary;
+  }
+}
+
+// ---- Container ----
+@mixin container {
+  width: 100%;
+  max-width: $max-width;
+  margin: 0 auto;
+  padding: 0 $space-4;
+
+  @include md {
+    padding: 0 $space-8;
+  }
+}
+
+// ---- Section ----
+@mixin section {
+  padding: $space-16 0;
+
+  @include md {
+    padding: $space-24 0;
+  }
+}
+
+// ---- Text Truncation ----
+@mixin text-truncate($lines: 1) {
+  @if $lines == 1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+// ---- Skeleton Loading ----
+@mixin skeleton {
+  background: linear-gradient(
+    90deg,
+    $color-bg-surface 25%,
+    $color-bg-elevated 37%,
+    $color-bg-surface 63%
+  );
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+  border-radius: $radius-sm;
+}

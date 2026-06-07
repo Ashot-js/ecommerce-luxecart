@@ -1,0 +1,110 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.profile {
+  padding: $space-8 0 $space-16;
+
+  &__title { font-size: $fs-3xl; margin-bottom: $space-4; }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $space-6;
+    margin-top: $space-8;
+
+    @media (min-width: $bp-md) { grid-template-columns: 1fr 1.5fr; }
+  }
+
+  &__card {
+    background: $color-bg-card;
+    border: 1px solid $color-border;
+    border-radius: $radius-xl;
+    padding: $space-6;
+  }
+
+  &__section-title {
+    font-family: $font-body;
+    font-size: $fs-md;
+    font-weight: $fw-semibold;
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    margin-bottom: $space-6;
+    color: $color-text-primary;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__label {
+    font-size: $fs-xs;
+    color: $color-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__value {
+    font-size: $fs-base;
+    color: $color-text-primary;
+  }
+
+  &__role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-1;
+    padding: $space-1 $space-2;
+    border-radius: $radius-full;
+    font-size: $fs-xs;
+    font-weight: $fw-semibold;
+    text-transform: capitalize;
+
+    &--admin { background: rgba($color-burgundy, 0.2); color: $color-burgundy-light; }
+    &--customer { background: rgba($color-info, 0.15); color: $color-info; }
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $space-4;
+
+    @media (min-width: $bp-sm) { grid-template-columns: 1fr 1fr; }
+    &--3 {
+      @media (min-width: $bp-sm) { grid-template-columns: 1fr 1fr 1fr; }
+    }
+  }
+
+  &__form-field {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+
+    span {
+      font-size: $fs-sm;
+      font-weight: $fw-medium;
+      color: $color-text-secondary;
+    }
+
+    input { @include input-base; }
+  }
+
+  &__save-btn {
+    @include btn-primary;
+    align-self: flex-start;
+    margin-top: $space-2;
+  }
+}

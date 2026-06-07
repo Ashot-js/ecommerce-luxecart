@@ -1,0 +1,261 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// ============================================================
+// Admin Dashboard
+// ============================================================
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+
+  &__heading {
+    font-family: $font-display;
+    font-size: $fs-2xl;
+    color: $color-text-primary;
+    margin: 0;
+  }
+
+  // ---- Stat Cards ----
+  &__stats {
+    margin-bottom: $space-4;
+  }
+
+  &__stat-card {
+    @include card;
+    @include flex-center;
+    gap: $space-4;
+    padding: $space-6;
+    cursor: default;
+  }
+
+  &__stat-icon {
+    @include flex-center;
+    width: 48px;
+    height: 48px;
+    border-radius: $radius-md;
+    background: rgba($color-burgundy, 0.15);
+    color: $color-burgundy-light;
+    flex-shrink: 0;
+  }
+
+  &__stat-info {
+    @include flex-column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__stat-value {
+    font-family: $font-display;
+    font-size: $fs-2xl;
+    font-weight: $fw-bold;
+    color: $color-text-primary;
+    line-height: $line-height-tight;
+  }
+
+  &__stat-label {
+    font-size: $fs-sm;
+    color: $color-text-secondary;
+  }
+
+  &__stat-change {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: $fs-xs;
+    color: $color-success;
+    margin-top: 2px;
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  // ---- Two-column grid ----
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $space-6;
+
+    @include lg {
+      grid-template-columns: 1.5fr 1fr;
+    }
+  }
+
+  // ---- Cards ----
+  &__card {
+    @include card;
+    padding: 0;
+  }
+
+  &__card-header {
+    @include flex-between;
+    padding: $space-5 $space-6;
+    border-bottom: 1px solid $color-border;
+
+    h3 {
+      font-family: $font-display;
+      font-size: $fs-md;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: $space-2;
+      color: $color-text-primary;
+    }
+  }
+
+  &__view-all {
+    font-size: $fs-sm;
+    color: $color-burgundy-light;
+    text-decoration: none;
+    font-weight: $fw-medium;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $color-burgundy-glow;
+    }
+  }
+
+  // ---- Table ----
+  &__table-wrap {
+    overflow-x: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+      text-align: left;
+      padding: $space-3 $space-6;
+      font-size: $fs-xs;
+      font-weight: $fw-semibold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: $color-text-muted;
+      border-bottom: 1px solid $color-border;
+    }
+
+    td {
+      padding: $space-3 $space-6;
+      font-size: $fs-sm;
+      color: $color-text-primary;
+      border-bottom: 1px solid rgba($color-border, 0.5);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      transition: background $transition-fast;
+
+      &:hover {
+        background: rgba($color-burgundy, 0.03);
+      }
+
+      &:last-child td {
+        border-bottom: none;
+      }
+    }
+  }
+
+  &__table-right {
+    text-align: right;
+  }
+
+  &__order-id {
+    font-weight: $fw-semibold;
+    color: $color-burgundy-light;
+  }
+
+  &__muted {
+    color: $color-text-secondary !important;
+  }
+
+  &__total {
+    font-weight: $fw-semibold;
+  }
+
+  // ---- Status Badges ----
+  &__badge {
+    display: inline-block;
+    padding: $space-1 $space-2;
+    font-size: $fs-xs;
+    font-weight: $fw-semibold;
+    border-radius: $radius-full;
+    text-transform: capitalize;
+    letter-spacing: 0.03em;
+
+    &--delivered {
+      background: rgba($color-success, 0.15);
+      color: $color-success;
+    }
+
+    &--processing {
+      background: rgba($color-info, 0.15);
+      color: $color-info;
+    }
+
+    &--shipped {
+      background: rgba($color-burgundy-light, 0.15);
+      color: $color-burgundy-light;
+    }
+
+    &--pending {
+      background: rgba($color-warning, 0.15);
+      color: $color-warning;
+    }
+
+    &--cancelled {
+      background: rgba($color-error, 0.15);
+      color: $color-error;
+    }
+  }
+
+  // ---- Low Stock Alerts ----
+  &__alerts {
+    display: flex;
+    flex-direction: column;
+    padding: $space-4 $space-6;
+    gap: $space-5;
+  }
+
+  &__alert-item {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+
+  &__alert-info {
+    @include flex-between;
+  }
+
+  &__alert-name {
+    font-size: $fs-sm;
+    font-weight: $fw-medium;
+    color: $color-text-primary;
+  }
+
+  &__alert-meta {
+    font-size: $fs-xs;
+    color: $color-text-muted;
+
+    strong {
+      color: $color-warning;
+    }
+  }
+
+  &__alert-bar {
+    height: 4px;
+    background: $color-bg-surface;
+    border-radius: $radius-full;
+    overflow: hidden;
+  }
+
+  &__alert-fill {
+    height: 100%;
+    background: $color-warning;
+    border-radius: $radius-full;
+    transition: width $transition-slow;
+    min-width: 4px;
+  }
+}

@@ -1,0 +1,307 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: $z-sticky;
+  height: $header-height;
+  background: rgba($color-bg-primary, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid transparent;
+  transition: background $transition-base, border-color $transition-base, box-shadow $transition-base;
+
+  &--scrolled {
+    background: rgba($color-bg-primary, 0.95);
+    border-bottom-color: rgba($color-burgundy, 0.15);
+    box-shadow: $shadow-md;
+  }
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    gap: $space-4;
+  }
+
+  // ---- Logo ----
+  &__logo {
+    font-family: $font-display;
+    font-size: $fs-xl;
+    font-weight: $fw-bold;
+    letter-spacing: -0.5px;
+    text-decoration: none;
+    flex-shrink: 0;
+
+    &-text {
+      color: $color-text-primary;
+    }
+
+    &-accent {
+      color: $color-burgundy-light;
+      margin-left: 2px;
+    }
+  }
+
+  // ---- Desktop Nav ----
+  &__nav {
+    display: none;
+    align-items: center;
+    gap: $space-1;
+
+    @media (min-width: $bp-lg) {
+      display: flex;
+    }
+
+    &-link {
+      padding: $space-2 $space-3;
+      color: $color-text-secondary;
+      font-size: $fs-sm;
+      font-weight: $fw-medium;
+      text-decoration: none;
+      border-radius: $radius-md;
+      transition: color $transition-fast, background $transition-fast;
+
+      &:hover {
+        color: $color-text-primary;
+        background: rgba($color-text-primary, 0.04);
+      }
+
+      &--admin {
+        color: $color-burgundy-light;
+
+        &:hover {
+          color: $color-burgundy-glow;
+        }
+      }
+    }
+  }
+
+  // ---- Search ----
+  &__search {
+    display: none;
+    position: relative;
+    flex: 1;
+    max-width: 360px;
+
+    @media (min-width: $bp-md) {
+      display: flex;
+    }
+
+    &-icon {
+      position: absolute;
+      left: $space-3;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $color-text-muted;
+      pointer-events: none;
+    }
+
+    &-input {
+      width: 100%;
+      padding: $space-2 $space-3 $space-2 $space-10;
+      background: $color-bg-surface;
+      border: 1px solid $color-border;
+      border-radius: $radius-full;
+      color: $color-text-primary;
+      font-size: $fs-sm;
+      font-family: $font-body;
+      outline: none;
+      transition: border-color $transition-fast, background $transition-fast;
+
+      &::placeholder {
+        color: $color-text-muted;
+      }
+
+      &:focus {
+        border-color: $color-burgundy;
+        background: $color-bg-elevated;
+      }
+    }
+  }
+
+  // ---- Actions ----
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+    margin-left: auto;
+  }
+
+  &__action-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    color: $color-text-secondary;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: color $transition-fast, background $transition-fast;
+    text-decoration: none;
+
+    &:hover {
+      color: $color-text-primary;
+      background: rgba($color-text-primary, 0.05);
+    }
+  }
+
+  &__cart-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    background: $color-burgundy;
+    color: $color-text-primary;
+    font-size: 10px;
+    font-weight: $fw-bold;
+    border-radius: $radius-full;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  // ---- User Dropdown ----
+  &__user-menu {
+    position: relative;
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 220px;
+    background: $color-bg-elevated;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-lg;
+    overflow: hidden;
+    z-index: $z-dropdown;
+
+    &-header {
+      padding: $space-3 $space-4;
+    }
+
+    &-name {
+      font-size: $fs-sm;
+      font-weight: $fw-semibold;
+      color: $color-text-primary;
+    }
+
+    &-email {
+      font-size: $fs-xs;
+      color: $color-text-muted;
+      margin-top: 2px;
+    }
+
+    &-divider {
+      height: 1px;
+      background: $color-border;
+    }
+
+    &-item {
+      display: flex;
+      align-items: center;
+      gap: $space-2;
+      width: 100%;
+      padding: $space-3 $space-4;
+      font-size: $fs-sm;
+      color: $color-text-secondary;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background $transition-fast, color $transition-fast;
+      text-align: left;
+      font-family: $font-body;
+
+      &:hover {
+        background: rgba($color-text-primary, 0.04);
+        color: $color-text-primary;
+      }
+
+      &--danger {
+        color: $color-error;
+
+        &:hover {
+          background: rgba($color-error, 0.08);
+          color: $color-error;
+        }
+      }
+    }
+  }
+
+  // ---- Mobile Toggle ----
+  &__mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    color: $color-text-secondary;
+    cursor: pointer;
+    border-radius: $radius-md;
+
+    &:hover {
+      color: $color-text-primary;
+    }
+
+    @media (min-width: $bp-lg) {
+      display: none;
+    }
+  }
+
+  // ---- Mobile Menu ----
+  &__mobile-menu {
+    background: $color-bg-primary;
+    border-bottom: 1px solid $color-border;
+    overflow: hidden;
+  }
+
+  &__mobile-nav {
+    display: flex;
+    flex-direction: column;
+    padding: $space-4;
+    gap: $space-1;
+  }
+
+  &__mobile-link {
+    padding: $space-3 $space-4;
+    color: $color-text-secondary;
+    font-size: $fs-base;
+    font-weight: $fw-medium;
+    text-decoration: none;
+    border-radius: $radius-md;
+    transition: background $transition-fast, color $transition-fast;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: $font-body;
+
+    &:hover {
+      background: rgba($color-text-primary, 0.04);
+      color: $color-text-primary;
+    }
+
+    &--logout {
+      color: $color-error;
+      margin-top: $space-2;
+
+      &:hover {
+        background: rgba($color-error, 0.08);
+      }
+    }
+  }
+}

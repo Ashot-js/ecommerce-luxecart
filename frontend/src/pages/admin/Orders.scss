@@ -1,0 +1,209 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.admin-orders {
+  &__toolbar {
+    display: flex;
+    gap: $space-4;
+    margin-bottom: $space-6;
+    flex-wrap: wrap;
+  }
+
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-2 $space-3;
+    background: $color-bg-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    max-width: 300px;
+
+    svg { color: $color-text-muted; }
+    input {
+      background: none; border: none; color: $color-text-primary;
+      font-size: $fs-sm; font-family: $font-body; outline: none;
+    }
+  }
+
+  &__filters {
+    display: flex;
+    gap: $space-2;
+    flex-wrap: wrap;
+  }
+
+  &__filter-btn {
+    padding: $space-1 $space-3;
+    background: none;
+    border: 1px solid $color-border;
+    border-radius: $radius-full;
+    color: $color-text-secondary;
+    font-size: $fs-xs;
+    font-family: $font-body;
+    cursor: pointer;
+    text-transform: capitalize;
+    transition: all $transition-fast;
+
+    &:hover { border-color: $color-burgundy; color: $color-text-primary; }
+    &--active { border-color: $color-burgundy; background: $color-burgundy; color: white; }
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+  }
+
+  &__empty {
+    text-align: center;
+    padding: $space-16 0;
+    color: $color-text-muted;
+  }
+
+  // Card
+  &__card {
+    background: $color-bg-card;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    overflow: hidden;
+
+    &-header {
+      display: flex;
+      align-items: center;
+      gap: $space-4;
+      padding: $space-4 $space-5;
+      cursor: pointer;
+      transition: background $transition-fast;
+      flex-wrap: wrap;
+
+      &:hover { background: rgba($color-text-primary, 0.02); }
+    }
+
+    &-col {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    &-id {
+      font-size: $fs-sm;
+      font-weight: $fw-semibold;
+      color: $color-text-primary;
+      font-family: mono, monospace;
+    }
+
+    &-date {
+      font-size: $fs-xs;
+      color: $color-text-muted;
+    }
+
+    &-name {
+      font-size: $fs-sm;
+      color: $color-text-primary;
+    }
+
+    &-email {
+      font-size: $fs-xs;
+      color: $color-text-muted;
+    }
+
+    &-total {
+      font-size: $fs-md;
+      font-weight: $fw-bold;
+      color: $color-text-primary;
+      margin-left: auto;
+    }
+  }
+
+  &__status {
+    padding: $space-1 $space-2;
+    font-size: $fs-xs;
+    font-weight: $fw-semibold;
+    border-radius: $radius-full;
+    text-transform: capitalize;
+  }
+
+  // Detail
+  &__detail {
+    border-top: 1px solid $color-border;
+    padding: $space-4 $space-5;
+    overflow: hidden;
+  }
+
+  &__items {
+    margin-bottom: $space-4;
+
+    h4 {
+      font-family: $font-body;
+      font-size: $fs-xs;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: $color-text-muted;
+      margin-bottom: $space-3;
+    }
+  }
+
+  &__item {
+    display: flex;
+    gap: $space-4;
+    padding: $space-2 0;
+    font-size: $fs-sm;
+
+    &-name { flex: 1; color: $color-text-primary; }
+    &-qty { color: $color-text-muted; }
+    &-price { color: $color-burgundy-light; font-weight: $fw-semibold; min-width: 70px; text-align: right; }
+
+    &--total {
+      border-top: 1px solid $color-border;
+      padding-top: $space-2;
+      margin-top: $space-2;
+      font-weight: $fw-bold;
+      color: $color-text-primary;
+    }
+  }
+
+  &__shipping {
+    margin-bottom: $space-4;
+
+    h4 {
+      font-family: $font-body;
+      font-size: $fs-xs;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: $color-text-muted;
+      margin-bottom: $space-2;
+    }
+
+    p { font-size: $fs-sm; color: $color-text-secondary; margin-bottom: 1px; }
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+
+    span { font-size: $fs-xs; color: $color-text-muted; }
+
+    &-btns {
+      display: flex;
+      gap: $space-2;
+      flex-wrap: wrap;
+
+      button {
+        padding: $space-1 $space-3;
+        background: none;
+        border: 1px solid $color-border;
+        border-radius: $radius-full;
+        color: $color-text-secondary;
+        font-size: $fs-xs;
+        font-family: $font-body;
+        cursor: pointer;
+        text-transform: capitalize;
+        transition: all $transition-fast;
+
+        &:hover:not(:disabled) { border-color: $color-burgundy; color: $color-text-primary; }
+        &:disabled { opacity: 0.5; cursor: default; }
+      }
+    }
+  }
+}

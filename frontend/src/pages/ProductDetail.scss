@@ -1,0 +1,245 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.product-detail {
+  padding: $space-8 0 $space-16;
+
+  &__loading, &__error {
+    text-align: center;
+    padding: $space-16 0;
+    color: $color-text-muted;
+
+    h2 { margin-bottom: $space-4; }
+    a { color: $color-burgundy-light; font-weight: $fw-medium; }
+  }
+
+  // Breadcrumb
+  &__breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    margin-bottom: $space-8;
+    font-size: $fs-sm;
+    color: $color-text-muted;
+    flex-wrap: wrap;
+
+    a {
+      color: $color-text-muted;
+      display: flex;
+      align-items: center;
+      gap: $space-1;
+      &:hover { color: $color-text-primary; }
+    }
+
+    &-current { color: $color-text-primary; }
+  }
+
+  // Main layout
+  &__main {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $space-8;
+
+    @media (min-width: $bp-md) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  // Image
+  &__image-wrap {
+    position: relative;
+    border-radius: $radius-xl;
+    overflow: hidden;
+    background: $color-bg-surface;
+    aspect-ratio: 1;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__discount-badge {
+    position: absolute;
+    top: $space-4;
+    left: $space-4;
+    padding: $space-2 $space-3;
+    background: $color-burgundy;
+    color: white;
+    font-weight: $fw-bold;
+    font-size: $fs-sm;
+    border-radius: $radius-md;
+  }
+
+  // Info
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  &__category {
+    font-size: $fs-xs;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $color-burgundy-light;
+    font-weight: $fw-semibold;
+  }
+
+  &__name {
+    font-size: $fs-2xl;
+    line-height: 1.2;
+
+    @media (min-width: $bp-md) { font-size: $fs-3xl; }
+  }
+
+  // Rating
+  &__rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    span {
+      font-size: $fs-sm;
+      color: $color-text-muted;
+      margin-left: $space-2;
+    }
+  }
+
+  // Price
+  &__price {
+    display: flex;
+    align-items: baseline;
+    gap: $space-3;
+    flex-wrap: wrap;
+  }
+
+  &__price-current {
+    font-size: $fs-2xl;
+    font-weight: $fw-bold;
+    font-family: $font-display;
+    color: $color-text-primary;
+  }
+
+  &__price-compare {
+    font-size: $fs-lg;
+    color: $color-text-muted;
+    text-decoration: line-through;
+  }
+
+  &__price-save {
+    font-size: $fs-sm;
+    color: $color-success;
+    font-weight: $fw-medium;
+  }
+
+  // Description
+  &__description {
+    color: $color-text-secondary;
+    font-size: $fs-base;
+    line-height: $line-height-relaxed;
+  }
+
+  // Stock
+  &__stock {
+    font-size: $fs-sm;
+  }
+
+  &__stock-in {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    color: $color-success;
+  }
+
+  &__stock-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    &--in { background: $color-success; }
+  }
+
+  &__stock-out {
+    color: $color-error;
+  }
+
+  // Actions
+  &__actions {
+    display: flex;
+    gap: $space-3;
+    align-items: stretch;
+  }
+
+  &__qty {
+    display: flex;
+    align-items: center;
+    background: $color-bg-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    overflow: hidden;
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 44px;
+      background: none;
+      border: none;
+      color: $color-text-secondary;
+      cursor: pointer;
+      transition: color $transition-fast, background $transition-fast;
+
+      &:hover:not(:disabled) { color: $color-text-primary; background: rgba(white, 0.04); }
+      &:disabled { opacity: 0.3; cursor: not-allowed; }
+    }
+
+    span {
+      min-width: 40px;
+      text-align: center;
+      font-weight: $fw-semibold;
+      font-size: $fs-base;
+    }
+  }
+
+  &__add-btn {
+    @include btn-primary;
+    flex: 1;
+    padding: $space-3 $space-8;
+    font-size: $fs-base;
+    gap: $space-2;
+  }
+
+  // Features
+  &__features {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+    margin-top: $space-6;
+    padding: $space-4;
+    background: $color-bg-surface;
+    border-radius: $radius-lg;
+    border: 1px solid $color-border;
+  }
+
+  &__feature {
+    display: flex;
+    align-items: flex-start;
+    gap: $space-3;
+
+    svg { color: $color-burgundy-light; flex-shrink: 0; margin-top: 2px; }
+
+    &-title {
+      font-size: $fs-sm;
+      font-weight: $fw-semibold;
+      color: $color-text-primary;
+    }
+
+    &-sub {
+      font-size: $fs-xs;
+      color: $color-text-muted;
+      margin-top: 2px;
+    }
+  }
+}

@@ -1,0 +1,351 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.cart {
+  min-height: calc(100vh - $header-height);
+  background: $color-bg-primary;
+  padding: $space-8 0 $space-20;
+
+  &__container {
+    @include container;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $space-8;
+    align-items: flex-start;
+
+    @include lg {
+      grid-template-columns: 1fr 360px;
+    }
+  }
+
+  // ---- Empty State ----
+  &__empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $space-20 $space-4;
+    text-align: center;
+  }
+
+  &__empty-icon {
+    color: $color-text-muted;
+    margin-bottom: $space-6;
+    opacity: 0.5;
+  }
+
+  &__empty-heading {
+    font-family: $font-display;
+    font-size: $fs-2xl;
+    font-weight: $fw-bold;
+    color: $color-text-primary;
+    margin: 0 0 $space-3;
+  }
+
+  &__empty-text {
+    color: $color-text-secondary;
+    font-size: $fs-base;
+    margin: 0 0 $space-8;
+    max-width: 400px;
+  }
+
+  &__empty-cta {
+    @include btn-primary;
+    padding: $space-3 $space-8;
+  }
+
+  // ---- Main Table Area ----
+  &__main {
+    min-width: 0;
+  }
+
+  &__header {
+    display: flex;
+    align-items: baseline;
+    gap: $space-4;
+    margin-bottom: $space-8;
+  }
+
+  &__heading {
+    font-family: $font-display;
+    font-size: $fs-2xl;
+    font-weight: $fw-bold;
+    color: $color-text-primary;
+    margin: 0;
+  }
+
+  &__count {
+    font-size: $fs-sm;
+    color: $color-text-muted;
+  }
+
+  &__loading,
+  &__error {
+    padding: $space-8;
+    text-align: center;
+    color: $color-text-secondary;
+    font-size: $fs-sm;
+  }
+
+  &__error {
+    color: $color-error;
+  }
+
+  &__table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  &__table-head-row {
+    border-bottom: 1px solid $color-border;
+  }
+
+  &__th {
+    text-align: left;
+    padding: $space-3 $space-4;
+    font-size: $fs-xs;
+    font-weight: $fw-medium;
+    color: $color-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+
+    &--product {
+      min-width: 240px;
+    }
+
+    &--price,
+    &--quantity,
+    &--total {
+      text-align: center;
+      width: 100px;
+    }
+
+    &--actions {
+      width: 60px;
+      text-align: center;
+    }
+  }
+
+  &__row {
+    border-bottom: 1px solid $color-border;
+    transition: background $transition-fast;
+
+    &:hover {
+      background: rgba($color-bg-surface, 0.5);
+    }
+  }
+
+  &__td {
+    padding: $space-4;
+    vertical-align: middle;
+
+    &--price,
+    &--quantity,
+    &--total {
+      text-align: center;
+    }
+
+    &--actions {
+      text-align: center;
+    }
+  }
+
+  // ---- Product Cell ----
+  &__product {
+    display: flex;
+    align-items: center;
+    gap: $space-4;
+  }
+
+  &__product-img {
+    width: 56px;
+    height: 56px;
+    border-radius: $radius-md;
+    background: $color-bg-surface;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    svg {
+      color: $color-text-muted;
+    }
+  }
+
+  &__product-name {
+    font-size: $fs-sm;
+    font-weight: $fw-medium;
+    color: $color-text-primary;
+    line-height: $line-height-tight;
+  }
+
+  // ---- Quantity Controls ----
+  &__qty {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    overflow: hidden;
+  }
+
+  &__qty-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: $color-bg-surface;
+    border: none;
+    color: $color-text-secondary;
+    cursor: pointer;
+    transition: background $transition-fast, color $transition-fast;
+
+    &:hover:not(:disabled) {
+      background: $color-bg-elevated;
+      color: $color-text-primary;
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+  }
+
+  &__qty-value {
+    width: 40px;
+    text-align: center;
+    font-size: $fs-sm;
+    font-weight: $fw-medium;
+    color: $color-text-primary;
+    user-select: none;
+  }
+
+  &__line-total {
+    font-weight: $fw-semibold;
+    color: $color-text-primary;
+    font-size: $fs-sm;
+  }
+
+  // ---- Remove Button ----
+  &__remove-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: $radius-sm;
+    color: $color-text-muted;
+    cursor: pointer;
+    transition: color $transition-fast, background $transition-fast;
+
+    &:hover {
+      color: $color-error;
+      background: rgba($color-error, 0.1);
+    }
+  }
+
+  // ---- Bottom Nav ----
+  &__bottom-nav {
+    margin-top: $space-6;
+  }
+
+  &__continue-link {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    font-size: $fs-sm;
+    color: $color-text-secondary;
+    text-decoration: none;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $color-burgundy-light;
+    }
+  }
+
+  // ---- Summary Sidebar ----
+  &__summary {
+    background: $color-bg-card;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    padding: $space-8;
+    position: sticky;
+    top: calc($header-height + $space-8);
+
+    @include lg {
+      margin-top: 0;
+    }
+  }
+
+  &__summary-heading {
+    font-family: $font-display;
+    font-size: $fs-lg;
+    font-weight: $fw-bold;
+    color: $color-text-primary;
+    margin: 0 0 $space-6;
+  }
+
+  &__summary-lines {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+  }
+
+  &__summary-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: $fs-sm;
+    color: $color-text-secondary;
+
+    &--total {
+      font-size: $fs-md;
+      font-weight: $fw-bold;
+      color: $color-text-primary;
+    }
+  }
+
+  &__free-shipping {
+    color: $color-success;
+    font-weight: $fw-medium;
+  }
+
+  &__shipping-hint {
+    font-size: $fs-xs;
+    color: $color-text-muted;
+    margin: 0;
+  }
+
+  &__summary-divider {
+    height: 1px;
+    background: $color-border;
+    margin: $space-5 0;
+  }
+
+  &__checkout-btn {
+    @include btn-primary;
+    width: 100%;
+    margin-top: $space-6;
+    padding: $space-4 $space-6;
+    font-size: $fs-base;
+    text-decoration: none;
+    gap: $space-2;
+  }
+}

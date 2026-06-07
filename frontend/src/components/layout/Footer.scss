@@ -1,0 +1,133 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.footer {
+  background: $color-bg-secondary;
+  border-top: 1px solid $color-border;
+  padding: $space-16 0 $space-8;
+
+  &__inner {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $space-10;
+
+    @media (min-width: $bp-sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: $bp-lg) {
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+    }
+  }
+
+  // ---- Brand ----
+  &__brand {
+    max-width: 320px;
+  }
+
+  &__logo {
+    font-family: $font-display;
+    font-size: $fs-xl;
+    font-weight: $fw-bold;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: $space-4;
+
+    span {
+      color: $color-text-primary;
+    }
+  }
+
+  &__logo-accent {
+    color: $color-burgundy-light !important;
+    margin-left: 2px;
+  }
+
+  &__tagline {
+    color: $color-text-muted;
+    font-size: $fs-sm;
+    line-height: $line-height-relaxed;
+  }
+
+  // ---- Links ----
+  &__heading {
+    font-family: $font-body;
+    font-size: $fs-sm;
+    font-weight: $fw-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $color-text-primary;
+    margin-bottom: $space-4;
+  }
+
+  &__links {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    font-size: $fs-sm;
+    color: $color-text-muted;
+    text-decoration: none;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $color-text-primary;
+    }
+  }
+
+  // ---- Bottom ----
+  &__bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-4;
+    margin-top: $space-12;
+    padding-top: $space-6;
+    border-top: 1px solid $color-border;
+
+    @media (min-width: $bp-md) {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+
+  &__copyright {
+    color: $color-text-muted;
+    font-size: $fs-xs;
+    margin: 0;
+  }
+
+  &__socials {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  &__social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: $color-bg-surface;
+    border-radius: $radius-md;
+    color: $color-text-muted;
+    transition: color $transition-fast, background $transition-fast, transform $transition-fast;
+
+    &:hover {
+      color: $color-burgundy-light;
+      background: $color-bg-elevated;
+      transform: translateY(-2px);
+    }
+  }
+}

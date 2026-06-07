@@ -1,0 +1,225 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.cart-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 420px;
+  background: $color-bg-secondary;
+  border-left: 1px solid $color-border;
+  z-index: $z-modal + 1;
+  display: flex;
+  flex-direction: column;
+
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: $z-modal;
+  }
+
+  // ---- Header ----
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $space-4 $space-6;
+    border-bottom: 1px solid $color-border;
+  }
+
+  &__title {
+    font-family: $font-body;
+    font-size: $fs-lg;
+    font-weight: $fw-semibold;
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  &__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: none;
+    border: none;
+    color: $color-text-secondary;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: color $transition-fast, background $transition-fast;
+
+    &:hover {
+      color: $color-text-primary;
+      background: rgba($color-text-primary, 0.05);
+    }
+  }
+
+  // ---- Items ----
+  &__items {
+    flex: 1;
+    overflow-y: auto;
+    padding: $space-4;
+  }
+
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: $space-8;
+    text-align: center;
+
+    &-icon {
+      color: $color-text-muted;
+      margin-bottom: $space-4;
+    }
+
+    &-text {
+      color: $color-text-muted;
+      font-size: $fs-md;
+      margin-bottom: $space-6;
+    }
+  }
+
+  &__shop-btn {
+    @include btn-primary;
+    padding: $space-3 $space-8;
+    text-decoration: none;
+    font-size: $fs-sm;
+  }
+
+  // ---- Item ----
+  &__item {
+    display: flex;
+    gap: $space-3;
+    padding: $space-3 0;
+    border-bottom: 1px solid $color-border;
+
+    &-image {
+      width: 72px;
+      height: 72px;
+      border-radius: $radius-md;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    &-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    &-name {
+      font-size: $fs-sm;
+      font-weight: $fw-medium;
+      color: $color-text-primary;
+      @include text-truncate(1);
+      margin-bottom: 4px;
+    }
+
+    &-price {
+      font-size: $fs-sm;
+      font-weight: $fw-semibold;
+      color: $color-burgundy-light;
+      margin-bottom: $space-2;
+    }
+
+    &-qty {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      background: $color-bg-surface;
+      border: 1px solid $color-border;
+      border-radius: $radius-md;
+      overflow: hidden;
+
+      button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        background: none;
+        border: none;
+        color: $color-text-secondary;
+        cursor: pointer;
+        transition: color $transition-fast, background $transition-fast;
+
+        &:hover:not(:disabled) {
+          color: $color-text-primary;
+          background: rgba($color-text-primary, 0.05);
+        }
+
+        &:disabled {
+          opacity: 0.3;
+          cursor: not-allowed;
+        }
+      }
+
+      span {
+        min-width: 28px;
+        text-align: center;
+        font-size: $fs-xs;
+        font-weight: $fw-medium;
+        color: $color-text-primary;
+      }
+    }
+
+    &-remove {
+      display: flex;
+      align-items: flex-start;
+      padding-top: $space-1;
+      background: none;
+      border: none;
+      color: $color-text-muted;
+      cursor: pointer;
+      transition: color $transition-fast;
+
+      &:hover {
+        color: $color-error;
+      }
+    }
+  }
+
+  // ---- Footer ----
+  &__footer {
+    padding: $space-4 $space-6;
+    border-top: 1px solid $color-border;
+  }
+
+  &__subtotal {
+    display: flex;
+    justify-content: space-between;
+    font-size: $fs-md;
+    font-weight: $fw-semibold;
+    margin-bottom: $space-2;
+  }
+
+  &__shipping-note {
+    font-size: $fs-xs;
+    color: $color-text-muted;
+    margin-bottom: $space-4;
+  }
+
+  &__checkout-btn {
+    @include btn-primary;
+    width: 100%;
+    padding: $space-3;
+    text-decoration: none;
+    font-size: $fs-sm;
+    margin-bottom: $space-2;
+    display: flex;
+  }
+
+  &__continue-btn {
+    @include btn-ghost;
+    width: 100%;
+    padding: $space-2;
+    font-size: $fs-sm;
+  }
+}
