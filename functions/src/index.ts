@@ -12,7 +12,6 @@ const app = express();
 
 // ---- Secrets ----
 const jwtSecret = defineSecret('JWT_SECRET');
-const pgPassword = defineSecret('PGPASSWORD');
 
 // ---- Middleware ----
 app.use(cors({
@@ -26,7 +25,7 @@ app.get('/api/health', (_req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    env: 'production-fix',
+    env: 'production',
   });
 });
 
@@ -58,7 +57,7 @@ export const api = onRequest(
     memory: '256MiB',
     maxInstances: 1,
     timeoutSeconds: 60,
-    secrets: [jwtSecret, pgPassword],
+    secrets: [jwtSecret],
     invoker: 'public',
   },
   app,

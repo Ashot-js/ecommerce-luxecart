@@ -2,8 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import type { SafeUser, UserRole } from '../types.js';
 
-// JWT_SECRET is set as a Firebase secret
-const JWT_SECRET = process.env.JWT_SECRET || '';
+// Read JWT_SECRET at call time (NOT at module load — Firebase injects it asynchronously)
+function getSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET is not set. Check Firebase Secret Manager or .env file.');
+  }
+  return secret;
+}
 
 // Extend Express Request to carry authenticated user
 export interface AuthRequest extends Request {
@@ -17,11 +23,11 @@ export interface TokenPayload {
 }
 
 export function signToken(payload: TokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign(payload, getSecret(), { expiresIn: '7d' });
 }
 
 export function verifyToken(token: string): TokenPayload {
-  return jwt.verify(token, JWT_SECRET) as TokenPayload;
+  return jwt.verify(token, getSecret()) as TokenPayload;
 }
 
 // Middleware: require a valid JWT
@@ -52,7 +58,8 @@ export function authenticate(req: AuthRequest, res: Response, next: NextFunction
       updated_at: '',
     };
     next();
-  } catch {
+  } catch (err: any) {
+    console.error('Auth error:', err?.message || err);
     res.status(401).json({ error: 'Invalid or expired token' });
   }
 }
