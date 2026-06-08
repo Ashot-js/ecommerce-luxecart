@@ -135,8 +135,11 @@ export interface PaginatedResponse<T> {
 
 export interface ApiError {
   error: string;
-  details?: any;
+  details?: unknown;
 }
+
+/** PostgreSQL query parameter — the union of values `pg` accepts */
+export type QueryParam = string | number | boolean | null;
 
 export interface AddToCartInput {
   product_id: string;

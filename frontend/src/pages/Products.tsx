@@ -7,6 +7,7 @@ import { useAddToCartMutation } from '../store/slices/cartSlice';
 import { toast } from 'react-toastify';
 import type { Product } from '../types';
 import { MOCK_PRODUCTS, MOCK_CATEGORIES } from '../data/mockData';
+import { PLACEHOLDER_IMAGE } from '../constants';
 import './Products.scss';
 
 export default function Products() {
@@ -175,9 +176,11 @@ export default function Products() {
               >
                 <Link to={`/products/${product.slug}`} className="product-card__image-wrap">
                   <img
-                    src={product.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400'}
+                    src={product.image_url || PLACEHOLDER_IMAGE.replace('w=600', 'w=400')}
                     alt={product.name}
                     className="product-card__image"
+                    loading="lazy"
+                    decoding="async"
                   />
                   {product.compare_price && (
                     <span className="product-card__sale-badge">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Package, ChevronDown, ChevronUp, Clock, Truck, CheckCircle, XCircle } from 'lucide-react';
 import { useGetOrdersQuery } from '../store/api/ordersApi';
+import { PLACEHOLDER_IMAGE } from '../constants';
 import type { OrderStatus } from '../types';
 import './Orders.scss';
 
@@ -118,9 +119,11 @@ export default function Orders() {
                         {order.items?.map((item) => (
                           <div key={item.id} className="orders__item">
                             <img
-                              src={item.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=80'}
+                              src={item.image_url || PLACEHOLDER_IMAGE.replace('w=600', 'w=80')}
                               alt={item.name}
                               className="orders__item-img"
+                              loading="lazy"
+                              decoding="async"
                             />
                             <div className="orders__item-info">
                               <p className="orders__item-name">{item.name}</p>

@@ -12,6 +12,17 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Auto-recover from stale cache: reload if any chunk returns HTML instead of JS -->
+    <script>
+      window.addEventListener('error', function(e) {
+        if (e.message && e.message.includes('dynamically imported module')) {
+          if (!sessionStorage.getItem('luxecart-reloaded')) {
+            sessionStorage.setItem('luxecart-reloaded', '1');
+            location.reload();
+          }
+        }
+      });
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

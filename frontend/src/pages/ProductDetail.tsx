@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useGetProductQuery } from '../store/api/productsApi';
 import { useAddToCartMutation } from '../store/slices/cartSlice';
+import { PLACEHOLDER_IMAGE } from '../constants';
 import './ProductDetail.scss';
 
 export default function ProductDetail() {
@@ -81,9 +82,11 @@ export default function ProductDetail() {
           {/* Image */}
           <div className="product-detail__image-wrap">
             <img
-              src={product.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600'}
+              src={product.image_url || PLACEHOLDER_IMAGE}
               alt={product.name}
               className="product-detail__image"
+              fetchPriority="high"
+              decoding="async"
             />
             {discount > 0 && (
               <span className="product-detail__discount-badge">-{discount}%</span>

@@ -44,7 +44,7 @@ router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
 // GET /api/orders/:orderId
 router.get('/:orderId', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { orderId } = req.params;
+    const orderId = req.params.orderId as string;
 
     const order = await query<Order>(
       'SELECT * FROM orders WHERE id = $1 AND user_id = $2',

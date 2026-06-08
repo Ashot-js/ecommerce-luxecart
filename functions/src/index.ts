@@ -43,11 +43,12 @@ app.use((_req, res) => {
 });
 
 // ---- Global error handler ----
-app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error('Unhandled error:', err?.message || err);
+app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  const message = err instanceof Error ? err.message : String(err);
+  console.error('Unhandled error:', message);
   res.status(500).json({
     error: 'Internal server error',
-    details: err?.message || String(err),
+    details: message,
   });
 });
 

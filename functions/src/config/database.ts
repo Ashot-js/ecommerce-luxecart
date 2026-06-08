@@ -1,4 +1,5 @@
 import { Pool } from 'pg';
+import type { QueryParam } from '../types.js';
 
 // Lazy pool — created on first query, not at module load.
 // Firebase needs to analyse the code at deploy time without DATABASE_URL set.
@@ -30,9 +31,9 @@ function getPool(): Pool {
   return pool;
 }
 
-export async function query<T = any>(
+export async function query<T = unknown>(
   text: string,
-  params?: any[],
+  params?: QueryParam[],
 ): Promise<{ rows: T[]; rowCount: number }> {
   const start = Date.now();
   const result = await getPool().query(text, params);

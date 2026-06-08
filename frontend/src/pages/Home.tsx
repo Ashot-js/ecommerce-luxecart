@@ -4,6 +4,7 @@ import { Star, ShoppingCart, ArrowRight, ChevronRight, AlertTriangle } from 'luc
 import { useGetFeaturedProductsQuery, useGetCategoriesQuery } from '../store/api/productsApi';
 import type { Product } from '../types';
 import { MOCK_FEATURED, MOCK_CATEGORIES } from '../data/mockData';
+import { PLACEHOLDER_IMAGE } from '../constants';
 import './Home.scss';
 
 // ---- Animation variants ----
@@ -38,7 +39,7 @@ function RatingStars({ rating }: { rating: number }) {
 
 // ---- ProductCard ----
 function ProductCard({ product, index }: { product: Product; index: number }) {
-  const imageSrc = product.image_url || '/placeholder-product.svg';
+  const imageSrc = product.image_url || PLACEHOLDER_IMAGE;
 
   return (
     <motion.div
@@ -53,6 +54,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
           alt={product.name}
           className="product-card__image"
           loading={index < 4 ? 'eager' : 'lazy'}
+          decoding="async"
         />
         {product.category_name && (
           <span className="product-card__badge">{product.category_name}</span>

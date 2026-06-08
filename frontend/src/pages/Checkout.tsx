@@ -5,6 +5,7 @@ import { CreditCard, Shield, Truck } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useGetCartQuery } from '../store/slices/cartSlice';
 import { useCreateOrderMutation } from '../store/api/ordersApi';
+import { PLACEHOLDER_IMAGE, TAX_RATE, FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '../constants';
 import type { ShippingInfo } from '../types';
 import './Checkout.scss';
 
@@ -28,8 +29,8 @@ export default function Checkout() {
   });
 
   const subtotal = items.reduce((s, i) => s + (i.product_price ?? 0) * i.quantity, 0);
-  const tax = Math.round(subtotal * 0.08 * 100) / 100;
-  const shipping = subtotal >= 100 ? 0 : 9.99;
+  const tax = Math.round(subtotal * TAX_RATE * 100) / 100;
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
   const total = Math.round((subtotal + tax + shipping) * 100) / 100;
 
   const update = (field: keyof ShippingInfo, value: string) => {
@@ -137,9 +138,11 @@ export default function Checkout() {
               {items.map((item) => (
                 <div key={item.id} className="checkout__item">
                   <img
-                    src={item.product_image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100'}
+                    src={item.product_image_url || PLACEHOLDER_IMAGE.replace('w=600', 'w=100')}
                     alt={item.product_name}
                     className="checkout__item-img"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="checkout__item-info">
                     <p className="checkout__item-name">{item.product_name}</p>

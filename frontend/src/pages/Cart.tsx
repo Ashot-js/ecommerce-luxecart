@@ -6,10 +6,8 @@ import {
   useUpdateCartItemMutation,
   useRemoveCartItemMutation,
 } from '../store/slices/cartSlice';
+import { TAX_RATE, FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '../constants';
 import './Cart.scss';
-
-const TAX_RATE = 0.08;
-const FREE_SHIPPING_THRESHOLD = 100;
 
 const Cart = () => {
   const { data, isLoading, isError } = useGetCartQuery();
@@ -23,7 +21,7 @@ const Cart = () => {
     0
   );
   const tax = subtotal * TAX_RATE;
-  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD || subtotal === 0 ? 0 : 9.99;
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD || subtotal === 0 ? 0 : SHIPPING_COST;
   const total = subtotal + tax + shipping;
 
   const handleQuantityChange = async (itemId: string, newQty: number) => {
@@ -125,6 +123,7 @@ const Cart = () => {
                                   src={item.product_image_url}
                                   alt={item.product_name ?? ''}
                                   loading="lazy"
+                                  decoding="async"
                                 />
                               ) : (
                                 <ShoppingBag size={24} />

@@ -7,6 +7,7 @@ import { closeCartDrawer } from '../../store/slices/uiSlice';
 import {
   useGetCartQuery, useUpdateCartItemMutation, useRemoveCartItemMutation,
 } from '../../store/slices/cartSlice';
+import { PLACEHOLDER_IMAGE } from '../../constants';
 import './CartDrawer.scss';
 
 export default function CartDrawer() {
@@ -76,9 +77,11 @@ export default function CartDrawer() {
             items.map((item) => (
               <div key={item.id} className="cart-drawer__item">
                 <img
-                  src={item.product_image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200'}
+                  src={item.product_image_url || PLACEHOLDER_IMAGE.replace('w=600', 'w=200')}
                   alt={item.product_name}
                   className="cart-drawer__item-image"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="cart-drawer__item-info">
                   <p className="cart-drawer__item-name">{item.product_name}</p>

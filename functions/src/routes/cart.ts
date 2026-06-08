@@ -97,7 +97,7 @@ router.post('/', validate(addToCartSchema), async (req: AuthRequest, res: Respon
 // PATCH /api/cart/:itemId
 router.patch('/:itemId', validate(updateCartItemSchema), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { itemId } = req.params;
+    const itemId = req.params.itemId as string;
     const { quantity }: UpdateCartItemInput = req.body;
 
     // Verify item belongs to user
@@ -140,7 +140,7 @@ router.patch('/:itemId', validate(updateCartItemSchema), async (req: AuthRequest
 // DELETE /api/cart/:itemId
 router.delete('/:itemId', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { itemId } = req.params;
+    const itemId = req.params.itemId as string;
     const result = await query(
       'DELETE FROM cart_items WHERE id = $1 AND user_id = $2',
       [itemId, req.user!.id],

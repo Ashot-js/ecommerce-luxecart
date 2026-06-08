@@ -1,0 +1,24 @@
+﻿Total: 698.1 KB
+
+JS:
+239.9 KB	index-DKD3NnKe.js
+167.3 KB	ui-DZu8_042.js
+103.4 KB	vendor-DjgsVRJx.js
+27.9 KB	redux-CIR071EX.js
+6.5 KB	Orders-CYvKlcWO.js
+6.4 KB	Products-CAaKah0v.js
+6.1 KB	Home-CXunqSvo.js
+5.6 KB	Products-BeewypOi.js
+5.4 KB	Checkout-C8eUz2AB.js
+5.1 KB	Cart-DCRYjwyw.js
+4.9 KB	Register-DVbECa3p.js
+4.7 KB	ProductDetail-DmUnEQnf.js
+4.4 KB	Orders-C6NgUsE2.js
+4 KB	Dashboard-mLZrJ6Nf.js
+3.9 KB	Profile-5K7NiqKl.js
+3.8 KB	mockData-1U2OzNy3.js
+2.8 KB	Login-hVhCHQfx.js
+2.2 KB	AdminLayout-Csvd_-eR.js
+1.3 KB	productsApi-BvTX-6M8.js
+0.5 KB	ordersApi-29c_8ODY.js
+

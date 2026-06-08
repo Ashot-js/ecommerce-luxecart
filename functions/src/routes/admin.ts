@@ -5,7 +5,7 @@ import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import type {
   Product, Category, Order, OrderItem,
-  UpdateOrderStatusInput, AdminStats,
+  UpdateOrderStatusInput, AdminStats, QueryParam,
 } from '../types.js';
 
 const router = Router();
@@ -77,7 +77,7 @@ router.get('/orders', async (req: AuthRequest, res: Response): Promise<void> => 
     const offset = (page - 1) * limit;
 
     let where = '';
-    const params: any[] = [];
+    const params: QueryParam[] = [];
     if (status && ['pending', 'processing', 'shipped', 'delivered', 'cancelled'].includes(status)) {
       where = 'WHERE status = $1';
       params.push(status);
@@ -109,7 +109,7 @@ router.get('/orders', async (req: AuthRequest, res: Response): Promise<void> => 
 // ---- GET /api/admin/orders/:orderId ----
 router.get('/orders/:orderId', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { orderId } = req.params;
+    const orderId = req.params.orderId as string;
     const order = await query<Order>('SELECT * FROM orders WHERE id = $1', [orderId]);
     if (order.rows.length === 0) {
       res.status(404).json({ error: 'Order not found' });
@@ -134,7 +134,7 @@ router.patch(
   validate(updateOrderStatusSchema),
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-      const { orderId } = req.params;
+      const orderId = req.params.orderId as string;
       const { status }: UpdateOrderStatusInput = req.body;
 
       const result = await query<Order>(
@@ -173,8 +173,8 @@ router.post('/products', validate(productSchema), async (req: AuthRequest, res: 
       ],
     );
     res.status(201).json({ data: result.rows[0] });
-  } catch (err: any) {
-    if (err?.code === '23505') {
+  } catch (err: unknown) {
+    if (err instanceof Error && 'code' in err && (err as { code: string }).code === '23505') {
       res.status(409).json({ error: 'A product with this slug already exists' });
       return;
     }
@@ -186,7 +186,7 @@ router.post('/products', validate(productSchema), async (req: AuthRequest, res: 
 // ---- PUT /api/admin/products/:productId ----
 router.put('/products/:productId', validate(productSchema), async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { productId } = req.params;
+    const productId = req.params.productId as string;
     const p = req.body as z.infer<typeof productSchema>;
 
     const result = await query<Product>(
@@ -211,8 +211,8 @@ router.put('/products/:productId', validate(productSchema), async (req: AuthRequ
       return;
     }
     res.json({ data: result.rows[0] });
-  } catch (err: any) {
-    if (err?.code === '23505') {
+  } catch (err: unknown) {
+    if (err instanceof Error && 'code' in err && (err as { code: string }).code === '23505') {
       res.status(409).json({ error: 'A product with this slug already exists' });
       return;
     }
@@ -224,7 +224,7 @@ router.put('/products/:productId', validate(productSchema), async (req: AuthRequ
 // ---- DELETE /api/admin/products/:productId ----
 router.delete('/products/:productId', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { productId } = req.params;
+    const productId = req.params.productId as string;
     // Soft-delete by marking inactive
     const result = await query<Product>(
       'UPDATE products SET active = false WHERE id = $1 RETURNING *',

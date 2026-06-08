@@ -44,10 +44,9 @@ export default function Footer() {
             <a href="mailto:support@luxecart.com" className="footer__link">
               <Mail size={14} /> support@luxecart.com
             </a>
-            <a href="#" className="footer__link">Help Center</a>
-            <a href="#" className="footer__link">Shipping Info</a>
-            <a href="#" className="footer__link">Returns</a>
-            <a href="#" className="footer__link">Size Guide</a>
+            <a href="https://help.luxecart.com" className="footer__link" target="_blank" rel="noopener noreferrer">Help Center</a>
+            <a href="https://help.luxecart.com/shipping" className="footer__link" target="_blank" rel="noopener noreferrer">Shipping Info</a>
+            <a href="https://help.luxecart.com/returns" className="footer__link" target="_blank" rel="noopener noreferrer">Returns</a>
           </div>
         </div>
 
@@ -57,9 +56,9 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} LuxeCart. All rights reserved.
           </p>
           <div className="footer__socials">
-            <a href="#" className="footer__social-link" aria-label="Twitter"><Twitter size={18} /></a>
-            <a href="#" className="footer__social-link" aria-label="GitHub"><Github size={18} /></a>
-            <a href="#" className="footer__social-link" aria-label="Email"><Mail size={18} /></a>
+            <a href="https://twitter.com/luxecart" className="footer__social-link" aria-label="Twitter" target="_blank" rel="noopener noreferrer"><Twitter size={18} /></a>
+            <a href="https://github.com/Ashot-js/ecommerce-luxecart" className="footer__social-link" aria-label="GitHub" target="_blank" rel="noopener noreferrer"><Github size={18} /></a>
+            <a href="mailto:support@luxecart.com" className="footer__social-link" aria-label="Email"><Mail size={18} /></a>
           </div>
         </div>
       </div>

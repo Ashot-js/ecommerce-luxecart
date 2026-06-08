@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { query } from '../config/database.js';
 import { optionalAuth, AuthRequest } from '../middleware/auth.js';
 import { validateQuery } from '../middleware/validate.js';
-import type { Product, Category, PaginatedResponse, ProductFilters } from '../types.js';
+import type { Product, Category, PaginatedResponse, ProductFilters, QueryParam } from '../types.js';
 
 const router = Router();
 
@@ -26,7 +26,7 @@ router.get('/', validateQuery(productQuerySchema), async (req: AuthRequest, res:
   try {
     const { category, search, min_price, max_price, featured, sort_by, page, limit } = req.query as unknown as ProductFilters;
     const conditions: string[] = ['p.active = true'];
-    const params: any[] = [];
+    const params: QueryParam[] = [];
     let paramIdx = 1;
 
     if (category) {
@@ -102,7 +102,7 @@ router.get('/', validateQuery(productQuerySchema), async (req: AuthRequest, res:
        ${where}
        ORDER BY ${orderBy}
        LIMIT $${paramIdx++} OFFSET $${paramIdx++}`,
-      [...params, limit, offset],
+       [...params, limit as number, offset as number],
     );
 
     const response: PaginatedResponse<Product & { category_name?: string; category_slug?: string }> = {
@@ -113,9 +113,10 @@ router.get('/', validateQuery(productQuerySchema), async (req: AuthRequest, res:
       totalPages: Math.ceil(total / (limit ?? 20)),
     };
     res.json(response);
-  } catch (err: any) {
-    console.error('Get products error:', err);
-    res.status(500).json({ error: 'Internal server error', details: err?.message || String(err) });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error('Get products error:', message);
+    res.status(500).json({ error: 'Internal server error', details: message });
   }
 });
 
@@ -158,7 +159,7 @@ router.get('/categories', async (_req: AuthRequest, res: Response): Promise<void
 // GET /api/products/:slugOrId
 router.get('/:slugOrId', optionalAuth, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { slugOrId } = req.params;
+    const slugOrId = req.params.slugOrId as string;
 
     // Try by slug first, then by UUID
     const result = await query<Product>(
@@ -181,9 +182,10 @@ router.get('/:slugOrId', optionalAuth, async (req: AuthRequest, res: Response): 
     }
 
     res.json({ data: result.rows[0] });
-  } catch (err: any) {
-    console.error('Get product error:', err);
-    res.status(500).json({ error: 'Internal server error', details: err?.message || String(err) });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error('Get product error:', message);
+    res.status(500).json({ error: 'Internal server error', details: message });
   }
 });
 
