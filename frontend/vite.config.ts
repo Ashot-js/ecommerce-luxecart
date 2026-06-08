@@ -26,5 +26,17 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
+    minify: 'esbuild',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router', 'react-redux'],
+          ui: ['framer-motion', 'lucide-react', 'react-toastify'],
+          redux: ['@reduxjs/toolkit'],
+        },
+      },
+    },
+    reportCompressedSize: true,
+    chunkSizeWarningLimit: 500,
   },
 });

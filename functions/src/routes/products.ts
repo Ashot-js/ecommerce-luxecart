@@ -58,13 +58,24 @@ router.get('/', validateQuery(productQuerySchema), async (req: AuthRequest, res:
     const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     // Sorting
-    let orderBy = 'p.created_at DESC';
+    // Always use a safe parameterised fallback; validate sort_by separately
+    let orderBy: string;
     switch (sort_by) {
-      case 'price_asc': orderBy = 'p.price ASC'; break;
-      case 'price_desc': orderBy = 'p.price DESC'; break;
-      case 'newest': orderBy = 'p.created_at DESC'; break;
-      case 'rating': orderBy = 'p.rating DESC'; break;
-      case 'name': orderBy = 'p.name ASC'; break;
+      case 'price_asc':
+        orderBy = 'p.price ASC';
+        break;
+      case 'price_desc':
+        orderBy = 'p.price DESC';
+        break;
+      case 'rating':
+        orderBy = 'p.rating DESC';
+        break;
+      case 'name':
+        orderBy = 'p.name ASC';
+        break;
+      case 'newest':
+      default:
+        orderBy = 'p.created_at DESC';
     }
 
     const offset = ((page ?? 1) - 1) * (limit ?? 20);

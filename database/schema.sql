@@ -244,7 +244,7 @@ INSERT INTO products (name, slug, description, price, compare_price, stock, cate
     'Voice-controlled floor lamp with 16M colors, tunable white, and sunset timer. Works with Alexa, Google Home, and Apple HomeKit.',
     119.99, null, 35,
     (SELECT id FROM categories WHERE slug = 'home-garden'),
-    'https://images.unsplash.com/photo-1507473885765-e6ed057ab6fe?w=600',
+    'https://images.unsplash.com/photo-1540932239986-30128078f3c5?w=600',
     false, 4.8, 53
   ),
   (

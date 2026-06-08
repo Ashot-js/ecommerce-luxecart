@@ -1,9 +1,0 @@
-Users: [
-  {
-    "id": "f170ebed-941b-44d4-ba9f-8b78fa8be7ba",
-    "email": "ashotg771@gmail.com",
-    "role": "admin"
-  }
-]
-
-Made admin: ashotg771@gmail.com

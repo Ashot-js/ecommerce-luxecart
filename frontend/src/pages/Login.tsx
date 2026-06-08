@@ -127,8 +127,10 @@ const Login = () => {
           </Link>
         </p>
 
-        <p className="login__demo">
-          Demo: <strong>demo@luxecart.com</strong> / <strong>password123</strong>
+        <p className="login__register">
+          <Link to="/register" className="login__register-link">
+            Create an account
+          </Link>{' '}to start shopping.
         </p>
       </motion.div>
     </div>

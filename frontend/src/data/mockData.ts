@@ -55,7 +55,7 @@ export const MOCK_PRODUCTS: Product[] = [
     id: 'p7', name: 'Smart LED Floor Lamp', slug: 'smart-led-floor-lamp',
     description: 'Voice-controlled floor lamp with 16M colors.',
     price: 119.99, compare_price: null, stock: 35, category_id: 'cat-3', category_name: 'Home & Garden', category_slug: 'home-garden',
-    image_url: 'https://images.unsplash.com/photo-1507473885765-e6ed057ab6fe?w=600', images: [],
+    image_url: 'https://images.unsplash.com/photo-1540932239986-30128078f3c5?w=600', images: [],
     featured: false, active: true, rating: 4.8, review_count: 53, created_at: '', updated_at: '',
   },
   {

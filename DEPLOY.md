@@ -122,10 +122,10 @@ firebase open hosting:site
 firebase emulators:start
 ```
 
-| | Адрес |
-|---|---|
+|          | Адрес                   |
+| -------- | ----------------------- |
 | Фронтенд | `http://localhost:5000` |
-| API | `http://localhost:5001` |
+| API      | `http://localhost:5001` |
 
 ---
 
@@ -145,3 +145,40 @@ firebase deploy
 - [ ] `frontend\.env` заполнен (Firebase-конфиг, если есть)
 - [ ] PostgreSQL доступен из облака
 - [ ] Схема БД накатана: `node run_schema.js`
+
+---
+
+## 📊 Оптимизация проекта
+
+### Build оптимизация (Vite)
+
+- ✅ Terser minification (удаление console/debugger)
+- ✅ Код splitting (vendor, ui, redux бандлы)
+- ✅ Sourcemaps отключены в production
+- ✅ Lazy loading всех страниц (React.lazy + Suspense)
+
+### Bundle анализ
+
+```powershell
+cd frontend
+npm run build       # Показывает размер бандла
+npm run preview     # Локальный preview production
+```
+
+### Удаление неиспользуемого
+
+**Для очистки проекта от node_modules:**
+
+```powershell
+rm frontend/node_modules -Recurse -Force
+rm functions/node_modules -Recurse -Force
+npm ci --prefix frontend
+npm ci --prefix functions
+```
+
+### Performance советы
+
+- 🚀 Images: используй `loading="lazy"` (уже есть в Cart.tsx)
+- 🚀 CSS: сжимается автоматически в build
+- 🚀 API: используй RTK Query кэширование (уже есть)
+- 🚀 Code splitting: route-based lazy loading активно

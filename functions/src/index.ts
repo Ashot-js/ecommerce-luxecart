@@ -12,6 +12,7 @@ const app = express();
 
 // ---- Secrets ----
 const jwtSecret = defineSecret('JWT_SECRET');
+const databaseUrl = defineSecret('DATABASE_URL');
 
 // ---- Middleware ----
 app.use(cors({
@@ -57,7 +58,7 @@ export const api = onRequest(
     memory: '256MiB',
     maxInstances: 1,
     timeoutSeconds: 60,
-    secrets: [jwtSecret],
+    secrets: [jwtSecret, databaseUrl],
     invoker: 'public',
   },
   app,
