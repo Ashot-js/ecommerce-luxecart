@@ -20,20 +20,75 @@ async function run() {
   const sqlPath = path.join(__dirname, 'database', 'schema.sql');
   const sql = fs.readFileSync(sqlPath, 'utf8');
 
-  // Parse SQL into individual statements
+  // Parse SQL into individual statements.
+  // Handles single quotes ('...''...') and dollar-quoted strings ($$...$$ / $tag$...$tag$),
+  // so plpgsql function bodies containing ';' do not split incorrectly.
   const batches = [];
   let current = '';
-  for (const line of sql.split('\n')) {
-    const trimmed = line.trim();
-    if (trimmed === '' || trimmed.startsWith('--')) continue;
-    current += line + '\n';
-    if (trimmed.endsWith(';')) {
+  let i = 0;
+  const src = sql;
+  while (i < src.length) {
+    const c = src[i];
+    const rest = src.slice(i);
+
+    // Line comment
+    if (c === '-' && src[i + 1] === '-') {
+      const nl = src.indexOf('\n', i);
+      if (nl === -1) break;
+      i = nl + 1;
+      continue;
+    }
+
+    // Single-quoted string ('' is an escaped quote)
+    if (c === "'") {
+      current += c;
+      i++;
+      while (i < src.length) {
+        if (src[i] === "'" && src[i + 1] === "'") {
+          current += "''";
+          i += 2;
+        } else if (src[i] === "'") {
+          current += "'";
+          i++;
+          break;
+        } else {
+          current += src[i];
+          i++;
+        }
+      }
+      continue;
+    }
+
+    // Dollar-quoted string: $$...$$ or $tag$...$tag$
+    if (c === '$') {
+      const m = rest.match(/^\$[A-Za-z_0-9]*\$/);
+      if (m) {
+        const delim = m[0];
+        const endIdx = src.indexOf(delim, i + delim.length);
+        if (endIdx === -1) {
+          current += rest;
+          i = src.length;
+        } else {
+          current += src.slice(i, endIdx + delim.length);
+          i = endIdx + delim.length;
+        }
+        continue;
+      }
+    }
+
+    // Statement terminator outside of quotes
+    if (c === ';') {
       const stmt = current.trim();
       if (stmt && stmt !== ';') {
         batches.push(stmt);
       }
       current = '';
+      i++;
+      continue;
     }
+
+    current += c;
+    i++;
   }
   // Catch any trailing statement without semicolon
   if (current.trim()) batches.push(current.trim());
