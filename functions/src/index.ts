@@ -1,5 +1,4 @@
-import { onRequest } from 'firebase-functions/v2/https';
-import { defineSecret } from 'firebase-functions/params';
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import authRoutes from './routes/auth.js';
@@ -10,10 +9,6 @@ import adminRoutes from './routes/admin.js';
 
 const app = express();
 
-// ---- Secrets ----
-const jwtSecret = defineSecret('JWT_SECRET');
-const databaseUrl = defineSecret('DATABASE_URL');
-
 // ---- Middleware ----
 app.use(cors({
   origin: true,
@@ -21,12 +16,12 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '1mb' }));
 
-// ---- Health check (v5 pooler) ----
+// ---- Health check ----
 app.get('/api/health', (_req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    env: 'production',
+    env: process.env.NODE_ENV || 'development',
   });
 });
 
@@ -52,15 +47,8 @@ app.use((err: unknown, _req: express.Request, res: express.Response, _next: expr
   });
 });
 
-// Export as Firebase Function (Gen 2)
-export const api = onRequest(
-  {
-    region: 'us-central1',
-    memory: '256MiB',
-    maxInstances: 1,
-    timeoutSeconds: 60,
-    secrets: [jwtSecret, databaseUrl],
-    invoker: 'public',
-  },
-  app,
-);
+// ---- Start server (Render) ----
+const PORT = parseInt(process.env.PORT || '5000', 10);
+app.listen(PORT, () => {
+  console.log(`[LuxeCart API] listening on port ${PORT}`);
+});
