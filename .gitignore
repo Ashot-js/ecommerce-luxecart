@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
@@ -57,3 +56,4 @@ functions/deploy_log3.txt
 .turbo/
 dist-ssr
 *.tern-port
+*.tsbuildinfo

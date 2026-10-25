@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, ShieldCheck } from 'lucide-react';
 import {
@@ -7,6 +8,7 @@ import {
   useRemoveCartItemMutation,
 } from '../store/slices/cartSlice';
 import { TAX_RATE, FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '../constants';
+import { apiErrorText } from '../utils/apiError';
 import './Cart.scss';
 
 const Cart = () => {
@@ -28,16 +30,16 @@ const Cart = () => {
     if (newQty < 1) return;
     try {
       await updateCartItem({ itemId, quantity: newQty }).unwrap();
-    } catch {
-      // Silently fail — RTK Query will handle cache invalidation
+    } catch (err) {
+      toast.error(apiErrorText(err));
     }
   };
 
   const handleRemove = async (itemId: string) => {
     try {
       await removeCartItem(itemId).unwrap();
-    } catch {
-      // Silently fail
+    } catch (err) {
+      toast.error(apiErrorText(err));
     }
   };
 

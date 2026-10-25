@@ -1,120 +1,94 @@
-import { Router, Response } from 'express';
+import { Router, type Response } from 'express';
 import { z } from 'zod';
 import { query, transaction } from '../config/database.js';
-import { authenticate, AuthRequest } from '../middleware/auth.js';
-import { validate } from '../middleware/validate.js';
-import type { CartItem, Order, OrderItem, CreateOrderInput } from '../types.js';
+import { authenticate, type AuthRequest } from '../middleware/auth.js';
+import { validate, uuidParam } from '../middleware/validate.js';
+import type { Order, OrderItem } from '../types.js';
 
 const router = Router();
 
-// ---- Validation ----
+const TAX_RATE = 0.08;
+const FREE_SHIPPING_FROM = 100;
+const SHIPPING_COST = 9.99;
+
+const text = (max: number) => z.string().trim().min(1).max(max);
 const createOrderSchema = z.object({
-  shipping_name: z.string().min(1, 'Name is required').max(200),
-  shipping_email: z.string().email('Invalid email'),
-  shipping_phone: z.string().optional(),
-  shipping_line1: z.string().min(1, 'Address is required').max(255),
-  shipping_line2: z.string().optional(),
-  shipping_city: z.string().min(1, 'City is required').max(100),
-  shipping_state: z.string().min(1, 'State is required').max(100),
-  shipping_zip: z.string().min(1, 'ZIP code is required').max(20),
-  shipping_country: z.string().max(100).default('US'),
-  notes: z.string().optional(),
+  shipping_name: text(200),
+  shipping_email: z.string().trim().email('Invalid email').max(255),
+  shipping_phone: z.string().trim().max(30).optional(),
+  shipping_line1: text(255),
+  shipping_line2: z.string().trim().max(255).optional(),
+  shipping_city: text(100),
+  shipping_state: text(100),
+  shipping_zip: text(20),
+  shipping_country: text(100).default('US'),
+  notes: z.string().trim().max(1000).optional(),
 });
 
-// ---- All order routes require auth ----
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+class CheckoutError extends Error {}
+
 router.use(authenticate);
 
 // GET /api/orders
-router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const result = await query<Order>(
-      `SELECT * FROM orders
-       WHERE user_id = $1
-       ORDER BY created_at DESC
-       LIMIT 50`,
-      [req.user!.id],
-    );
-    res.json({ data: result.rows });
-  } catch (err) {
-    console.error('Get orders error:', err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+router.get('/', async (req: AuthRequest, res: Response) => {
+  const { rows } = await query<Order>(
+    'SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50',
+    [req.user!.id],
+  );
+  res.json({ data: rows });
 });
 
 // GET /api/orders/:orderId
-router.get('/:orderId', async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const orderId = req.params.orderId as string;
-
-    const order = await query<Order>(
-      'SELECT * FROM orders WHERE id = $1 AND user_id = $2',
-      [orderId, req.user!.id],
-    );
-    if (order.rows.length === 0) {
-      res.status(404).json({ error: 'Order not found' });
-      return;
-    }
-
-    const items = await query<OrderItem>(
-      'SELECT * FROM order_items WHERE order_id = $1',
-      [orderId],
-    );
-
-    const fullOrder = { ...order.rows[0]!, items: items.rows };
-    res.json({ data: fullOrder });
-  } catch (err) {
-    console.error('Get order error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+router.get('/:orderId', uuidParam('orderId'), async (req: AuthRequest, res: Response) => {
+  const orderId = req.params.orderId as string;
+  const order = await query<Order>('SELECT * FROM orders WHERE id = $1 AND user_id = $2', [orderId, req.user!.id]);
+  if (!order.rows[0]) {
+    res.status(404).json({ error: 'Order not found' });
+    return;
   }
+  const items = await query<OrderItem>('SELECT * FROM order_items WHERE order_id = $1', [orderId]);
+  res.json({ data: { ...order.rows[0], items: items.rows } });
 });
 
-// POST /api/orders
-router.post('/', validate(createOrderSchema), async (req: AuthRequest, res: Response): Promise<void> => {
+// POST /api/orders: turns the cart into an order.
+// Everything runs in one transaction with the product rows locked, so two
+// simultaneous checkouts cannot both buy the last item.
+router.post('/', validate(createOrderSchema), async (req: AuthRequest, res: Response) => {
+  const input = req.body as z.infer<typeof createOrderSchema>;
+  const userId = req.user!.id;
+
   try {
-    const input: CreateOrderInput = req.body;
-
-    // Fetch cart items with product details
-    const cartItems = await query<CartItem & { product_name: string; product_price: number; product_image_url: string | null; product_stock: number }>(
-      `SELECT ci.*,
-              p.name as product_name,
-              p.price as product_price,
-              p.image_url as product_image_url,
-              p.stock as product_stock,
-              p.active as product_active
-       FROM cart_items ci
-       JOIN products p ON ci.product_id = p.id
-       WHERE ci.user_id = $1`,
-      [req.user!.id],
-    );
-
-    if (cartItems.rows.length === 0) {
-      res.status(400).json({ error: 'Cart is empty' });
-      return;
-    }
-
-    // Validate stock for all items
-    for (const item of cartItems.rows) {
-      if (item.quantity > (item.product_stock ?? 0)) {
-        res.status(400).json({
-          error: `Insufficient stock for "${item.product_name}". Available: ${item.product_stock}`,
-        });
-        return;
-      }
-    }
-
-    // Calculate totals
-    const subtotal = cartItems.rows.reduce(
-      (sum, item) => sum + (item.product_price ?? 0) * item.quantity,
-      0,
-    );
-    const TAX_RATE = 0.08; // 8%
-    const tax = Math.round(subtotal * TAX_RATE * 100) / 100;
-    const shipping_cost = subtotal >= 100 ? 0 : 9.99; // Free shipping over $100
-    const total = Math.round((subtotal + tax + shipping_cost) * 100) / 100;
-
-    // Create order in transaction
     const order = await transaction(async (txn) => {
-      const orderResult = await txn<Order>(
+      const { rows: cart } = await txn<{
+        product_id: string; quantity: number; name: string; price: number;
+        image_url: string | null; stock: number; active: boolean;
+      }>(
+        `SELECT ci.product_id, ci.quantity, p.name, p.price,
+                p.image_url, p.stock, p.active
+         FROM cart_items ci
+         JOIN products p ON ci.product_id = p.id
+         WHERE ci.user_id = $1
+         ORDER BY p.id
+         FOR UPDATE OF p`,
+        [userId],
+      );
+
+      if (cart.length === 0) throw new CheckoutError('Cart is empty');
+      for (const item of cart) {
+        if (!item.active) throw new CheckoutError(`"${item.name}" is no longer available`);
+        if (item.quantity > item.stock) {
+          throw new CheckoutError(`Insufficient stock for "${item.name}". Available: ${item.stock}`);
+        }
+      }
+
+      const subtotal = round2(cart.reduce((sum, i) => sum + i.price * i.quantity, 0));
+      const tax = round2(subtotal * TAX_RATE);
+      const shipping = subtotal >= FREE_SHIPPING_FROM ? 0 : SHIPPING_COST;
+      const total = round2(subtotal + tax + shipping);
+
+      const { rows } = await txn<Order>(
         `INSERT INTO orders
          (user_id, subtotal, tax, shipping_cost, total,
           shipping_name, shipping_email, shipping_phone,
@@ -123,47 +97,36 @@ router.post('/', validate(createOrderSchema), async (req: AuthRequest, res: Resp
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
          RETURNING *`,
         [
-          req.user!.id, subtotal, tax, shipping_cost, total,
-          input.shipping_name, input.shipping_email, input.shipping_phone ?? null,
-          input.shipping_line1, input.shipping_line2 ?? null, input.shipping_city,
-          input.shipping_state, input.shipping_zip, input.shipping_country ?? 'US',
-          input.notes ?? null,
+          userId, subtotal, tax, shipping, total,
+          input.shipping_name, input.shipping_email, input.shipping_phone || null,
+          input.shipping_line1, input.shipping_line2 || null, input.shipping_city,
+          input.shipping_state, input.shipping_zip, input.shipping_country,
+          input.notes || null,
         ],
       );
+      const newOrder = rows[0]!;
 
-      const newOrder = orderResult.rows[0]!;
-
-      // Insert order items
-      for (const item of cartItems.rows) {
+      for (const item of cart) {
         await txn(
           `INSERT INTO order_items (order_id, product_id, name, price, quantity, image_url)
            VALUES ($1, $2, $3, $4, $5, $6)`,
-          [newOrder.id, item.product_id, item.product_name, item.product_price, item.quantity, item.product_image_url],
+          [newOrder.id, item.product_id, item.name, item.price, item.quantity, item.image_url],
         );
-
-        // Deduct stock
-        await txn(
-          'UPDATE products SET stock = stock - $1 WHERE id = $2',
-          [item.quantity, item.product_id],
-        );
+        await txn('UPDATE products SET stock = stock - $1 WHERE id = $2', [item.quantity, item.product_id]);
       }
+      await txn('DELETE FROM cart_items WHERE user_id = $1', [userId]);
 
-      // Clear cart
-      await txn('DELETE FROM cart_items WHERE user_id = $1', [req.user!.id]);
-
-      return newOrder;
+      const items = await txn<OrderItem>('SELECT * FROM order_items WHERE order_id = $1', [newOrder.id]);
+      return { ...newOrder, items: items.rows };
     });
 
-    // Fetch full order with items
-    const items = await query<OrderItem>(
-      'SELECT * FROM order_items WHERE order_id = $1',
-      [order.id],
-    );
-
-    res.status(201).json({ data: { ...order, items: items.rows } });
+    res.status(201).json({ data: order });
   } catch (err) {
-    console.error('Create order error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    if (err instanceof CheckoutError) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    throw err;
   }
 });
 

@@ -349,3 +349,37 @@
     gap: $space-2;
   }
 }
+
+// ---- Phones: each table row becomes a card (product on top, controls below) ----
+@media (max-width: #{$bp-sm - 1px}) {
+  .cart {
+    &__table thead {
+      display: none;
+    }
+
+    &__row {
+      display: grid;
+      grid-template-columns: auto 1fr auto auto;
+      align-items: center;
+      gap: $space-2 $space-3;
+      padding: $space-4 0;
+    }
+
+    &__td {
+      padding: 0;
+
+      &--product {
+        grid-column: 1 / -1;
+      }
+
+      &--price {
+        color: $color-text-muted;
+        font-size: $fs-sm;
+      }
+
+      &--total {
+        text-align: right;
+      }
+    }
+  }
+}

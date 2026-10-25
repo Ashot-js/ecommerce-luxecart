@@ -138,13 +138,14 @@
     margin: 0;
   }
 
+  // Two columns even on phones: one product per screen made the page endless.
   &__grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: $space-6;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-3;
 
     @include sm {
-      grid-template-columns: repeat(2, 1fr);
+      gap: $space-6;
     }
 
     @include lg {
@@ -266,8 +267,12 @@
     display: flex;
     flex-direction: column;
     gap: $space-3;
-    padding: $space-4 $space-4 $space-5;
+    padding: $space-3 $space-3 $space-4;
     flex: 1;
+
+    @include sm {
+      padding: $space-4 $space-4 $space-5;
+    }
   }
 
   &__stars {
@@ -411,11 +416,11 @@
 
   &__grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: $space-6;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-3;
 
     @include sm {
-      grid-template-columns: repeat(2, 1fr);
+      gap: $space-6;
     }
 
     @include lg {
@@ -435,9 +440,11 @@
 // CATEGORY CARD
 // ============================================================
 .category-card {
+  --category-card-height: 120px;
   @include card;
+  @include sm { --category-card-height: 220px; }
   border-radius: $radius-xl;
-  min-height: 220px;
+  min-height: var(--category-card-height);
 
   &--skeleton {
     pointer-events: none;
@@ -451,7 +458,7 @@
     position: relative;
     display: block;
     height: 100%;
-    min-height: 220px;
+    min-height: var(--category-card-height);
     text-decoration: none;
     overflow: hidden;
     border-radius: $radius-xl;
@@ -497,13 +504,15 @@
     flex-direction: column;
     justify-content: flex-end;
     height: 100%;
-    min-height: 220px;
-    padding: $space-6;
+    min-height: var(--category-card-height);
+    padding: $space-4;
+    @include sm { padding: $space-6; }
   }
 
   &__name {
     font-family: $font-display;
-    font-size: $fs-xl;
+    font-size: $fs-lg;
+    @include sm { font-size: $fs-xl; }
     font-weight: $fw-semibold;
     color: $color-text-primary;
     margin: 0 0 $space-2;

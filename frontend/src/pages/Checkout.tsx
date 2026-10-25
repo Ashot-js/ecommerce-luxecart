@@ -8,6 +8,7 @@ import { useCreateOrderMutation } from '../store/api/ordersApi';
 import { PLACEHOLDER_IMAGE, TAX_RATE, FREE_SHIPPING_THRESHOLD, SHIPPING_COST } from '../constants';
 import type { ShippingInfo } from '../types';
 import './Checkout.scss';
+import { apiErrorText } from '../utils/apiError';
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -45,11 +46,11 @@ export default function Checkout() {
       return;
     }
     try {
-      const result = await createOrder(form).unwrap();
+      await createOrder(form).unwrap();
       toast.success('Order placed successfully!');
-      navigate(`/orders/${result.data.id}`);
-    } catch (err: any) {
-      toast.error(err?.data?.error || 'Failed to place order');
+      navigate('/orders');
+    } catch (err) {
+      toast.error(apiErrorText(err, 'Failed to place order'));
     }
   };
 

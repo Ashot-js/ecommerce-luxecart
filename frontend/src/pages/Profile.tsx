@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
 import { User, Mail, Shield, Save } from 'lucide-react';
@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import type { RootState } from '../store';
 import { setUser } from '../store/slices/authSlice';
 import { useUpdateProfileMutation } from '../store/slices/authSlice';
+import { apiErrorText } from '../utils/apiError';
 import './Profile.scss';
 
 export default function Profile() {
@@ -25,25 +26,13 @@ export default function Profile() {
     country: user?.country || 'US',
   });
 
-  useEffect(() => {
-    if (user) {
-      setForm({
-        first_name: user.first_name, last_name: user.last_name,
-        phone: user.phone || '', address_line1: user.address_line1 || '',
-        address_line2: user.address_line2 || '', city: user.city || '',
-        state: user.state || '', zip_code: user.zip_code || '',
-        country: user.country || 'US',
-      });
-    }
-  }, [user]);
-
   const handleSave = async () => {
     try {
       const result = await updateProfile(form).unwrap();
       dispatch(setUser(result.user));
       toast.success('Profile updated');
-    } catch {
-      toast.error('Failed to update profile');
+    } catch (err) {
+      toast.error(apiErrorText(err, 'Failed to update profile'));
     }
   };
 

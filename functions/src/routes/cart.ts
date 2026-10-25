@@ -1,170 +1,133 @@
-import { Router, Response } from 'express';
+import { Router, type Response } from 'express';
 import { z } from 'zod';
 import { query } from '../config/database.js';
-import { authenticate, AuthRequest } from '../middleware/auth.js';
-import { validate } from '../middleware/validate.js';
-import type { CartItem, Product, AddToCartInput, UpdateCartItemInput } from '../types.js';
+import { authenticate, type AuthRequest } from '../middleware/auth.js';
+import { validate, uuidParam } from '../middleware/validate.js';
+import type { CartItem } from '../types.js';
 
 const router = Router();
 
-// ---- Validation ----
+const MAX_QTY = 99;
+
 const addToCartSchema = z.object({
   product_id: z.string().uuid('Invalid product ID'),
-  quantity: z.number().int().min(1, 'Quantity must be at least 1').max(99),
+  quantity: z.number().int().min(1, 'Quantity must be at least 1').max(MAX_QTY),
 });
 
 const updateCartItemSchema = z.object({
-  quantity: z.number().int().min(0, 'Quantity must be 0 or more').max(99),
+  quantity: z.number().int().min(0, 'Quantity must be 0 or more').max(MAX_QTY),
 });
 
-// ---- All cart routes require auth ----
 router.use(authenticate);
 
 // GET /api/cart
-router.get('/', async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const result = await query<CartItem>(
-      `SELECT ci.*,
-              p.name as product_name,
-              p.price as product_price,
-              p.image_url as product_image_url,
-              p.stock as product_stock
-       FROM cart_items ci
-       JOIN products p ON ci.product_id = p.id
-       WHERE ci.user_id = $1 AND p.active = true
-       ORDER BY ci.created_at DESC`,
-      [req.user!.id],
-    );
-    res.json({ data: result.rows });
-  } catch (err) {
-    console.error('Get cart error:', err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+router.get('/', async (req: AuthRequest, res: Response) => {
+  const { rows } = await query<CartItem>(
+    `SELECT ci.*,
+            p.name AS product_name,
+            p.price AS product_price,
+            p.image_url AS product_image_url,
+            p.stock AS product_stock
+     FROM cart_items ci
+     JOIN products p ON ci.product_id = p.id
+     WHERE ci.user_id = $1 AND p.active = true
+     ORDER BY ci.created_at DESC`,
+    [req.user!.id],
+  );
+  res.json({ data: rows });
 });
 
 // GET /api/cart/count
-router.get('/count', async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const result = await query<{ count: string }>(
-      `SELECT COALESCE(SUM(ci.quantity), 0) as count
-       FROM cart_items ci
-       JOIN products p ON ci.product_id = p.id
-       WHERE ci.user_id = $1 AND p.active = true`,
-      [req.user!.id],
-    );
-    res.json({ count: parseInt(result.rows[0]?.count ?? '0', 10) });
-  } catch (err) {
-    console.error('Get cart count error:', err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+router.get('/count', async (req: AuthRequest, res: Response) => {
+  const { rows } = await query<{ count: number }>(
+    `SELECT COALESCE(SUM(ci.quantity), 0)::int AS count
+     FROM cart_items ci
+     JOIN products p ON ci.product_id = p.id
+     WHERE ci.user_id = $1 AND p.active = true`,
+    [req.user!.id],
+  );
+  res.json({ count: rows[0]?.count ?? 0 });
 });
 
-// POST /api/cart
-router.post('/', validate(addToCartSchema), async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const { product_id, quantity }: AddToCartInput = req.body;
+// POST /api/cart: adds to the existing quantity; the total may not exceed stock.
+router.post('/', validate(addToCartSchema), async (req: AuthRequest, res: Response) => {
+  const { product_id, quantity } = req.body as z.infer<typeof addToCartSchema>;
 
-    // Verify product exists and is active
-    const product = await query<Product>(
-      'SELECT id, stock, active FROM products WHERE id = $1',
-      [product_id],
-    );
-    if (product.rows.length === 0 || !product.rows[0]?.active) {
-      res.status(404).json({ error: 'Product not found' });
-      return;
-    }
-    if ((product.rows[0]?.stock ?? 0) < quantity) {
-      res.status(400).json({ error: 'Insufficient stock' });
-      return;
-    }
-
-    // Upsert cart item
-    const result = await query<CartItem>(
-      `INSERT INTO cart_items (user_id, product_id, quantity)
-       VALUES ($1, $2, $3)
-       ON CONFLICT (user_id, product_id)
-       DO UPDATE SET quantity = cart_items.quantity + $3, updated_at = NOW()
-       RETURNING *`,
-      [req.user!.id, product_id, quantity],
-    );
-    res.status(201).json({ data: result.rows[0] });
-  } catch (err) {
-    console.error('Add to cart error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+  const product = await query<{ stock: number }>(
+    'SELECT stock FROM products WHERE id = $1 AND active = true',
+    [product_id],
+  );
+  const stock = product.rows[0]?.stock;
+  if (stock === undefined) {
+    res.status(404).json({ error: 'Product not found' });
+    return;
   }
+
+  // The WHERE on the upsert rejects the update when the new total would exceed stock.
+  const { rows } = await query<CartItem>(
+    `INSERT INTO cart_items (user_id, product_id, quantity)
+     SELECT $1::uuid, $2::uuid, $3::int WHERE $3::int <= $4::int
+     ON CONFLICT (user_id, product_id)
+     DO UPDATE SET quantity = cart_items.quantity + EXCLUDED.quantity
+       WHERE cart_items.quantity + EXCLUDED.quantity <= LEAST($4::int, ${MAX_QTY})
+     RETURNING *`,
+    [req.user!.id, product_id, quantity, stock],
+  );
+  if (!rows[0]) {
+    res.status(400).json({ error: 'Insufficient stock' });
+    return;
+  }
+  res.status(201).json({ data: rows[0] });
 });
 
-// PATCH /api/cart/:itemId
-router.patch('/:itemId', validate(updateCartItemSchema), async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const itemId = req.params.itemId as string;
-    const { quantity }: UpdateCartItemInput = req.body;
+// PATCH /api/cart/:itemId: quantity 0 removes the item.
+router.patch('/:itemId', uuidParam('itemId'), validate(updateCartItemSchema), async (req: AuthRequest, res: Response) => {
+  const { quantity } = req.body as z.infer<typeof updateCartItemSchema>;
+  const itemId = req.params.itemId as string;
 
-    // Verify item belongs to user
-    const existing = await query<CartItem>(
-      'SELECT * FROM cart_items WHERE id = $1 AND user_id = $2',
-      [itemId, req.user!.id],
-    );
-    if (existing.rows.length === 0) {
+  if (quantity === 0) {
+    const del = await query('DELETE FROM cart_items WHERE id = $1 AND user_id = $2', [itemId, req.user!.id]);
+    if (del.rowCount === 0) {
       res.status(404).json({ error: 'Cart item not found' });
       return;
     }
-
-    if (quantity === 0) {
-      await query('DELETE FROM cart_items WHERE id = $1', [itemId]);
-      res.json({ data: null });
-      return;
-    }
-
-    // Check stock
-    const product = await query<Product>(
-      'SELECT stock FROM products WHERE id = $1',
-      [existing.rows[0]!.product_id],
-    );
-    if (quantity > (product.rows[0]?.stock ?? 0)) {
-      res.status(400).json({ error: 'Insufficient stock' });
-      return;
-    }
-
-    const result = await query<CartItem>(
-      'UPDATE cart_items SET quantity = $1 WHERE id = $2 RETURNING *',
-      [quantity, itemId],
-    );
-    res.json({ data: result.rows[0] });
-  } catch (err) {
-    console.error('Update cart item error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.json({ data: null });
+    return;
   }
+
+  const { rows } = await query<CartItem & { stock: number }>(
+    `UPDATE cart_items ci SET quantity = $1
+     FROM products p
+     WHERE ci.id = $2 AND ci.user_id = $3 AND p.id = ci.product_id AND p.stock >= $1
+     RETURNING ci.*`,
+    [quantity, itemId, req.user!.id],
+  );
+  if (rows[0]) {
+    res.json({ data: rows[0] });
+    return;
+  }
+  const exists = await query('SELECT 1 FROM cart_items WHERE id = $1 AND user_id = $2', [itemId, req.user!.id]);
+  if (exists.rowCount === 0) res.status(404).json({ error: 'Cart item not found' });
+  else res.status(400).json({ error: 'Insufficient stock' });
 });
 
 // DELETE /api/cart/:itemId
-router.delete('/:itemId', async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const itemId = req.params.itemId as string;
-    const result = await query(
-      'DELETE FROM cart_items WHERE id = $1 AND user_id = $2',
-      [itemId, req.user!.id],
-    );
-    if (result.rowCount === 0) {
-      res.status(404).json({ error: 'Cart item not found' });
-      return;
-    }
-    res.json({ data: null });
-  } catch (err) {
-    console.error('Delete cart item error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+router.delete('/:itemId', uuidParam('itemId'), async (req: AuthRequest, res: Response) => {
+  const result = await query('DELETE FROM cart_items WHERE id = $1 AND user_id = $2', [
+    req.params.itemId as string,
+    req.user!.id,
+  ]);
+  if (result.rowCount === 0) {
+    res.status(404).json({ error: 'Cart item not found' });
+    return;
   }
+  res.json({ data: null });
 });
 
-// DELETE /api/cart (clear cart)
-router.delete('/', async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    await query('DELETE FROM cart_items WHERE user_id = $1', [req.user!.id]);
-    res.json({ data: null });
-  } catch (err) {
-    console.error('Clear cart error:', err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+// DELETE /api/cart: clears the cart
+router.delete('/', async (req: AuthRequest, res: Response) => {
+  await query('DELETE FROM cart_items WHERE user_id = $1', [req.user!.id]);
+  res.json({ data: null });
 });
 
 export default router;

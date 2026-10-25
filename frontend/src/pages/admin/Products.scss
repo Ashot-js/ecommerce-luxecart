@@ -48,13 +48,20 @@
 
   &__form-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: $space-3;
     margin-bottom: $space-3;
 
-    input {
+    input,
+    select {
       @include input-base;
     }
+  }
+
+  &__empty {
+    padding: $space-6;
+    text-align: center;
+    color: $color-text-secondary;
   }
 
   &__form-actions {

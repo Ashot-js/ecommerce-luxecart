@@ -171,6 +171,18 @@
     color: $color-text-secondary !important;
   }
 
+  &__state {
+    padding: $space-8 0;
+    text-align: center;
+    color: $color-text-secondary;
+
+    button {
+      margin-left: $space-2;
+      color: $color-burgundy-light;
+      text-decoration: underline;
+    }
+  }
+
   &__total {
     font-weight: $fw-semibold;
   }

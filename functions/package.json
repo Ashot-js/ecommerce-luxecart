@@ -10,13 +10,18 @@
   "scripts": {
     "build": "tsc",
     "start": "node lib/index.js",
-    "dev": "node --watch lib/index.js"
+    "dev": "tsc --watch --preserveWatchOutput & node --watch lib/index.js",
+    "db:setup": "node scripts/db-setup.js",
+    "make-admin": "node scripts/make-admin.js",
+    "smoke": "node scripts/smoke-test.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.21.2",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.14.1",
     "zod": "^3.24.4"
@@ -24,8 +29,9 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.3",
+    "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^22.20.5",
     "@types/pg": "^8.11.12",
     "typescript": "~5.9.3"
   }

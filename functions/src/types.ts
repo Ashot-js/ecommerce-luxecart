@@ -105,19 +105,7 @@ export interface OrderItem {
   created_at: string;
 }
 
-// ---- API Request / Response types ----
-export interface RegisterInput {
-  email: string;
-  password: string;
-  first_name: string;
-  last_name: string;
-}
-
-export interface LoginInput {
-  email: string;
-  password: string;
-}
-
+// ---- API response types ----
 export interface AuthResponse {
   token: string;
   user: SafeUser;
@@ -133,50 +121,8 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
-export interface ApiError {
-  error: string;
-  details?: unknown;
-}
-
 /** PostgreSQL query parameter — the union of values `pg` accepts */
 export type QueryParam = string | number | boolean | null;
-
-export interface AddToCartInput {
-  product_id: string;
-  quantity: number;
-}
-
-export interface UpdateCartItemInput {
-  quantity: number;
-}
-
-export interface CreateOrderInput {
-  shipping_name: string;
-  shipping_email: string;
-  shipping_phone?: string;
-  shipping_line1: string;
-  shipping_line2?: string;
-  shipping_city: string;
-  shipping_state: string;
-  shipping_zip: string;
-  shipping_country?: string;
-  notes?: string;
-}
-
-export interface UpdateOrderStatusInput {
-  status: OrderStatus;
-}
-
-export interface ProductFilters {
-  category?: string;
-  search?: string;
-  min_price?: number;
-  max_price?: number;
-  featured?: boolean;
-  sort_by?: 'price_asc' | 'price_desc' | 'newest' | 'rating' | 'name';
-  page?: number;
-  limit?: number;
-}
 
 export interface AdminStats {
   total_products: number;

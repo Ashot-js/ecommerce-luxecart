@@ -5,10 +5,11 @@ import { Search, SlidersHorizontal, Star, ShoppingCart, AlertTriangle } from 'lu
 import { useGetProductsQuery, useGetCategoriesQuery } from '../store/api/productsApi';
 import { useAddToCartMutation } from '../store/slices/cartSlice';
 import { toast } from 'react-toastify';
-import type { Product } from '../types';
+import type { Product, ProductFilters } from '../types';
 import { MOCK_PRODUCTS, MOCK_CATEGORIES } from '../data/mockData';
 import { PLACEHOLDER_IMAGE } from '../constants';
 import './Products.scss';
+import { apiErrorText } from '../utils/apiError';
 
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -17,7 +18,7 @@ export default function Products() {
 
   const category = searchParams.get('category') || undefined;
   const featured = searchParams.get('featured') === 'true' || undefined;
-  const sortBy = (searchParams.get('sort_by') as any) || 'newest';
+  const sortBy = (searchParams.get('sort_by') as ProductFilters['sort_by']) || 'newest';
   const searchQuery = searchParams.get('search') || undefined;
   const page = parseInt(searchParams.get('page') || '1', 10);
 
@@ -61,8 +62,8 @@ export default function Products() {
     try {
       await addToCart({ product_id: product.id, quantity: 1 }).unwrap();
       toast.success(`${product.name} added to cart`);
-    } catch {
-      toast.error('Please sign in to add items to cart');
+    } catch (err) {
+      toast.error(apiErrorText(err));
     }
   };
 
@@ -73,7 +74,7 @@ export default function Products() {
       {/* Offline banner */}
       {isOffline && (
         <div className="offline-banner">
-          <AlertTriangle size={16} /> Backend not connected — showing demo data. <a href="https://console.firebase.google.com/project/ecommerce-luxecart/usage/details" target="_blank">Enable Blaze plan</a> and deploy functions.
+          <AlertTriangle size={16} /> The store server is unavailable right now — showing demo products. Please try again in a minute.
         </div>
       )}
 

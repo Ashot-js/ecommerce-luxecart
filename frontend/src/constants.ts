@@ -12,3 +12,6 @@ export const TAX_RATE = 0.08;
 
 /** Standard shipping cost when below threshold */
 export const SHIPPING_COST = 9.99;
+
+/** Matches the backend: products at or below this stock show in admin alerts */
+export const LOW_STOCK_THRESHOLD = 5;

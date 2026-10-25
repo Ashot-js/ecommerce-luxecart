@@ -137,7 +137,7 @@ export default function Home() {
       {/* Offline banner */}
       {isOffline && (
         <div className="offline-banner">
-          <AlertTriangle size={16} /> Backend not connected — showing demo data.
+          <AlertTriangle size={16} /> The store server is unavailable right now — showing demo products. Please try again in a minute.
         </div>
       )}
       {/* ==================== HERO ==================== */}

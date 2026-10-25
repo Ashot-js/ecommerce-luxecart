@@ -7,6 +7,7 @@ import { useGetProductQuery } from '../store/api/productsApi';
 import { useAddToCartMutation } from '../store/slices/cartSlice';
 import { PLACEHOLDER_IMAGE } from '../constants';
 import './ProductDetail.scss';
+import { apiErrorText } from '../utils/apiError';
 
 export default function ProductDetail() {
   const { slugOrId } = useParams<{ slugOrId: string }>();
@@ -21,8 +22,8 @@ export default function ProductDetail() {
     try {
       await addToCart({ product_id: product.id, quantity }).unwrap();
       toast.success(`${product.name} added to cart`);
-    } catch {
-      toast.error('Please sign in to add items to cart');
+    } catch (err) {
+      toast.error(apiErrorText(err));
     }
   };
 

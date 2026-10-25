@@ -1,6 +1,5 @@
--- LuxeCart E-Commerce Database Schema
--- PostgreSQL (Supabase free tier: 500MB)
--- Run this via Supabase SQL Editor or psql after creating the project
+-- LuxeCart e-commerce database schema (PostgreSQL 14+).
+-- Apply to an empty database: cd functions && npm run db:setup
 
 -- ============================================================
 -- EXTENSIONS
@@ -132,7 +131,7 @@ CREATE INDEX idx_orders_created ON orders(created_at DESC);
 CREATE TABLE order_items (
   id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   order_id   UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
-  product_id UUID NOT NULL REFERENCES products(id) ON DELETE SET NULL,
+  product_id UUID REFERENCES products(id) ON DELETE SET NULL,
   name       VARCHAR(255) NOT NULL,
   price      NUMERIC(10, 2) NOT NULL,
   quantity   INTEGER NOT NULL CHECK (quantity > 0),

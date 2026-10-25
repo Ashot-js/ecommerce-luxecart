@@ -1,66 +1,32 @@
 import { motion } from 'framer-motion';
-import {
-  Package,
-  ShoppingCart,
-  Users,
-  DollarSign,
-  TrendingUp,
-  AlertTriangle,
-} from 'lucide-react';
+import { Link } from 'react-router';
+import { Package, ShoppingCart, Users, DollarSign, AlertTriangle } from 'lucide-react';
+import { useGetAdminStatsQuery } from '../../store/api/adminApi';
+import { LOW_STOCK_THRESHOLD } from '../../constants';
 import './Dashboard.scss';
 
-// ---- Mock Data ----
-const stats = [
-  { label: 'Total Products', value: 142, icon: Package, change: '+12 this month' },
-  { label: 'Total Orders', value: 3_284, icon: ShoppingCart, change: '+18% vs last month' },
-  { label: 'Total Users', value: 1_892, icon: Users, change: '+245 this week' },
-  { label: 'Total Revenue', value: '$84,290', icon: DollarSign, change: '+22% vs last month' },
-];
-
-interface RecentOrder {
-  id: string;
-  customer: string;
-  date: string;
-  total: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-}
-
-const recentOrders: RecentOrder[] = [
-  { id: '#ORD-8912', customer: 'Sarah Johnson', date: '2025-01-15', total: 245.99, status: 'delivered' },
-  { id: '#ORD-8913', customer: 'Mike Chen', date: '2025-01-15', total: 89.50, status: 'processing' },
-  { id: '#ORD-8914', customer: 'Emily Davis', date: '2025-01-14', total: 432.00, status: 'shipped' },
-  { id: '#ORD-8915', customer: 'James Wilson', date: '2025-01-14', total: 129.99, status: 'pending' },
-  { id: '#ORD-8916', customer: 'Lisa Brown', date: '2025-01-13', total: 67.25, status: 'cancelled' },
-];
-
-interface LowStockItem {
-  id: string;
-  name: string;
-  stock: number;
-  threshold: number;
-}
-
-const lowStockAlerts: LowStockItem[] = [
-  { id: 'prod-1', name: 'Leather Weekend Bag', stock: 3, threshold: 10 },
-  { id: 'prod-2', name: 'Cashmere Scarf', stock: 2, threshold: 5 },
-  { id: 'prod-3', name: 'Silver Cufflinks', stock: 1, threshold: 8 },
-  { id: 'prod-4', name: 'Wool Blazer', stock: 4, threshold: 12 },
-];
-
-const statusBadgeClass = (status: string): string => {
-  const map: Record<string, string> = {
-    delivered: 'dashboard__badge--delivered',
-    processing: 'dashboard__badge--processing',
-    shipped: 'dashboard__badge--shipped',
-    pending: 'dashboard__badge--pending',
-    cancelled: 'dashboard__badge--cancelled',
-  };
-  return map[status] ?? '';
-};
-
-
+const money = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 export default function Dashboard() {
+  const { data, isLoading, isError, refetch } = useGetAdminStatsQuery();
+  const stats = data?.data;
+
+  if (isLoading) return <div className="dashboard__state">Loading dashboard…</div>;
+  if (isError || !stats) {
+    return (
+      <div className="dashboard__state">
+        Could not load the dashboard. <button onClick={refetch}>Try again</button>
+      </div>
+    );
+  }
+
+  const cards = [
+    { label: 'Active Products', value: stats.total_products.toLocaleString(), icon: Package },
+    { label: 'Total Orders', value: stats.total_orders.toLocaleString(), icon: ShoppingCart },
+    { label: 'Total Users', value: stats.total_users.toLocaleString(), icon: Users },
+    { label: 'Revenue', value: money(stats.total_revenue), icon: DollarSign },
+  ];
+
   return (
     <div className="dashboard">
       <motion.h2
@@ -72,9 +38,8 @@ export default function Dashboard() {
         Dashboard Overview
       </motion.h2>
 
-      {/* Stats Grid */}
       <div className="grid-4 dashboard__stats">
-        {stats.map((s, i) => (
+        {cards.map((s, i) => (
           <motion.div
             key={s.label}
             className="dashboard__stat-card"
@@ -88,26 +53,16 @@ export default function Dashboard() {
             <div className="dashboard__stat-info">
               <span className="dashboard__stat-value">{s.value}</span>
               <span className="dashboard__stat-label">{s.label}</span>
-              <span className="dashboard__stat-change">
-                <TrendingUp size={12} />
-                {s.change}
-              </span>
             </div>
           </motion.div>
         ))}
       </div>
 
       <div className="dashboard__grid">
-        {/* Recent Orders */}
-        <motion.div
-          className="dashboard__card"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.32, duration: 0.35 }}
-        >
+        <div className="dashboard__card">
           <div className="dashboard__card-header">
             <h3>Recent Orders</h3>
-            <a href="/admin/orders" className="dashboard__view-all">View All</a>
+            <Link to="/admin/orders" className="dashboard__view-all">View All</Link>
           </div>
           <div className="dashboard__table-wrap">
             <table className="dashboard__table">
@@ -121,58 +76,54 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {recentOrders.map((order) => (
+                {stats.recent_orders.map((order) => (
                   <tr key={order.id}>
-                    <td className="dashboard__order-id">{order.id}</td>
-                    <td>{order.customer}</td>
-                    <td className="dashboard__muted">{order.date}</td>
+                    <td className="dashboard__order-id">#{order.id.slice(0, 8)}</td>
+                    <td>{order.shipping_name}</td>
+                    <td className="dashboard__muted">{new Date(order.created_at).toLocaleDateString()}</td>
                     <td>
-                      <span className={`dashboard__badge ${statusBadgeClass(order.status)}`}>
-                        {order.status}
-                      </span>
+                      <span className={`dashboard__badge dashboard__badge--${order.status}`}>{order.status}</span>
                     </td>
-                    <td className="dashboard__table-right dashboard__total">
-                      ${order.total.toFixed(2)}
-                    </td>
+                    <td className="dashboard__table-right dashboard__total">{money(order.total)}</td>
                   </tr>
                 ))}
+                {stats.recent_orders.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="dashboard__muted">No orders yet.</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Low Stock Alerts */}
-        <motion.div
-          className="dashboard__card"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.35 }}
-        >
+        <div className="dashboard__card">
           <div className="dashboard__card-header">
             <h3>
               <AlertTriangle size={18} />
-              Low Stock Alerts
+              Low Stock (≤ {LOW_STOCK_THRESHOLD})
             </h3>
           </div>
           <div className="dashboard__alerts">
-            {lowStockAlerts.map((item) => (
+            {stats.low_stock_products.map((item) => (
               <div key={item.id} className="dashboard__alert-item">
                 <div className="dashboard__alert-info">
                   <span className="dashboard__alert-name">{item.name}</span>
                   <span className="dashboard__alert-meta">
-                    Stock: <strong>{item.stock}</strong> / threshold: {item.threshold}
+                    Stock: <strong>{item.stock}</strong>
                   </span>
                 </div>
                 <div className="dashboard__alert-bar">
                   <div
                     className="dashboard__alert-fill"
-                    style={{ width: `${Math.min((item.stock / item.threshold) * 100, 100)}%` }}
+                    style={{ width: `${(item.stock / LOW_STOCK_THRESHOLD) * 100}%` }}
                   />
                 </div>
               </div>
             ))}
+            {stats.low_stock_products.length === 0 && <p className="dashboard__muted">All products are well stocked.</p>}
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
