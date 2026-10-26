@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { z, type ZodSchema } from 'zod';
 
 function details(err: z.ZodError) {
-  return err.errors.map((e) => ({ field: e.path.join('.'), message: e.message }));
+  return err.issues.map((e) => ({ field: e.path.join('.'), message: e.message }));
 }
 
 export function validate(schema: ZodSchema) {
