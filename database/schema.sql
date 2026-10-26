@@ -255,3 +255,15 @@ INSERT INTO products (name, slug, description, price, compare_price, stock, cate
     'https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=600',
     false, 4.6, 92
   );
+
+-- ============================================================
+-- ROW LEVEL SECURITY
+-- The API connects as the table owner, which bypasses RLS. Enabling it with no
+-- policies blocks everyone else (e.g. Supabase's public Data API / anon key).
+-- ============================================================
+ALTER TABLE users       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE categories  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE products    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cart_items  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;

@@ -16,7 +16,7 @@ const sql = fs.readFileSync(new URL('../../database/schema.sql', import.meta.url
 
 await client.connect();
 try {
-  const { rowCount } = await client.query("SELECT 1 FROM information_schema.tables WHERE table_name = 'users'");
+  const { rowCount } = await client.query("SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users'");
   if (rowCount) {
     console.log('Schema already exists, nothing to do.');
   } else {
