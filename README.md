@@ -1,127 +1,57 @@
-# 🛒 LuxeCart — Ecommerce
+# LuxeCart — интернет-магазин
 
-Интернет-магазин на React + Firebase. Фронтенд, бэкенд (Cloud Functions) и база данных PostgreSQL.
+Витрина, корзина, оформление заказа, личный кабинет и админ-панель (товары, заказы, статистика).
 
----
+**Сайт:** https://ecommerce-luxecart.web.app
+**API:** https://luxecart-api-wxmk.onrender.com/api/health
 
-## Стек
+## Как устроено (всё на бесплатных тарифах)
 
-| Слой | Технологии |
-|------|-----------|
-| Фронтенд | React 19, Vite, TypeScript, Redux Toolkit, SCSS, Framer Motion |
-| Бэкенд | Firebase Cloud Functions, Express, JWT, Zod, bcrypt |
-| База данных | PostgreSQL |
-| Хостинг | Firebase Hosting |
-| API | `/api/**` → Express в Cloud Functions |
+| Часть | Где работает | Что делает |
+|-------|--------------|-----------|
+| Витрина (`frontend/`) | Firebase Hosting | React 19, TypeScript, Redux Toolkit (RTK Query), SCSS, Framer Motion |
+| Сервер (`functions/`) | Render (Free) | Express 5, JWT, Zod, bcrypt, helmet, rate limit |
+| База данных (`database/schema.sql`) | Supabase (Free) | PostgreSQL, RLS включён на всех таблицах |
 
----
+Бесплатный Render засыпает без посетителей — первый запрос после перерыва идёт ~50 секунд.
+Бесплатный проект Supabase ставится на паузу после ~7 дней без активности — разбудить кнопкой **Restore** в панели Supabase.
 
 ## Структура
 
 ```
-ecommerce/
-├── frontend/          # React-приложение (Vite)
-│   ├── src/           # исходники
-│   ├── dist/          # сборка (создаётся npm run build)
-│   └── package.json
-├── functions/         # Cloud Functions (Express API)
-│   ├── src/           # TypeScript-исходники
-│   ├── lib/           # скомпилированный JS (создаётся npm run build)
-│   ├── .env           # переменные окружения (не коммитить!)
-│   └── package.json
-├── database/
-│   └── schema.sql     # схема базы данных
-├── firebase.json      # конфиг Firebase
-├── .firebaserc        # проект ecommerce-luxecart
-└── run_schema.js      # скрипт наката схемы БД
+frontend/              React-приложение (Vite)
+  src/store/api/       запросы к API (RTK Query), в т.ч. adminApi.ts
+  src/components/auth/ проверка входа и прав администратора
+functions/             Express API
+  src/routes/          auth, products, cart, orders, admin
+  scripts/             db-setup, make-admin, smoke-test
+database/schema.sql    таблицы, индексы, стартовые товары
+render.yaml            настройки сервиса на Render
+firebase.json          настройки хостинга витрины
 ```
 
----
-
-## Установка и запуск
-
-### 1. Зависимости
+## Локальный запуск
 
 ```bash
-# Из корня ecommerce/
+# сервер
+cd functions
+cp .env.example .env        # вписать DATABASE_URL и JWT_SECRET
+npm install
+npm run db:setup            # один раз: таблицы и товары в пустой базе
+npm run build && npm start  # http://localhost:5000/api
 
-cd frontend && npm install && cd ..
-cd functions && npm install && cd ..
+# витрина (в другом терминале)
+cd frontend
+npm install
+npm run dev                 # http://localhost:5173, /api проксируется на :5000
 ```
 
-### 2. Переменные окружения
-
-Создай `functions/.env`:
-
-```
-DATABASE_URL=postgresql://user:password@host:5432/dbname
-JWT_SECRET=твой_секретный_ключ
-```
-
-### 3. База данных
-
-```bash
-# Накатить схему (указана в database/schema.sql)
-node run_schema.js
-```
-
-### 4. Запуск локально
-
-```bash
-# Эмуляторы Firebase (фронтенд + функции)
-firebase emulators:start
-```
-
-Фронтенд: `http://localhost:5000`  
-API: `http://localhost:5001`
-
-### 5. Скрипты
-
-**Фронтенд** (`frontend/`):
+## Полезные команды (`functions/`)
 
 | Команда | Что делает |
 |---------|-----------|
-| `npm run dev` | Запуск в режиме разработки |
-| `npm run build` | Сборка для продакшена |
-| `npm run preview` | Предпросмотр сборки |
-| `npm run lint` | Проверка кода ESLint |
+| `npm run db:setup` | создаёт таблицы и товары в пустой базе |
+| `npm run make-admin -- email@example.com` | делает зарегистрированного пользователя администратором |
+| `npm run smoke` | проверка всего API (42 шага); `API_BASE=https://.../api` — проверить живой сервер |
 
-**Функции** (`functions/`):
-
-| Команда | Что делает |
-|---------|-----------|
-| `npm run build` | Компиляция TypeScript |
-| `npm run serve` | Эмулятор функций |
-| `npm run deploy` | Деплой только функций |
-
----
-
-## GitHub
-
-🔗 **https://github.com/Ashot-js/ecommerce-luxecart**
-
-```powershell
-git remote add origin https://github.com/Ashot-js/ecommerce-luxecart.git
-```
-
----
-
-## Деплой
-
-Подробная инструкция: **[DEPLOY.md](./DEPLOY.md)**
-
-Коротко:
-
-```bash
-cd frontend && npm run build && cd ..
-cd functions && npm run build && cd ..
-firebase deploy
-```
-
----
-
-## ⚠️ Важно
-
-- **`.env`** — не коммитить (есть в `.gitignore`)
-- **`node_modules/`, `dist/`, `lib/`** — не коммитятся
-- База данных **PostgreSQL**, не Firebase Firestore. Строка подключения в `functions/.env`
+Выкладка — см. [DEPLOY.md](DEPLOY.md).

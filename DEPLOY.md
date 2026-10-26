@@ -1,184 +1,55 @@
-# 🚀 Deploy — Ecommerce LuxeCart
+# Выкладка LuxeCart
 
-> **Windows 11 Pro · Visual Studio Code · PowerShell**
+Три части, все бесплатные: база **Supabase**, сервер **Render**, витрина **Firebase Hosting**.
 
----
+## 1. База данных (Supabase) — один раз
 
-## Как открыть проект
+1. supabase.com → **New project** (регион Europe), сохранить пароль базы.
+2. **Connect** → **Direct** → Method **Session pooler** → скопировать строку
+   (`postgresql://postgres.<id>:[YOUR-PASSWORD]@aws-...pooler.supabase.com:5432/postgres`).
+   Нужен именно Session pooler: прямое подключение у Supabase только по IPv6, Render до него не достаёт.
+3. Подставить пароль. Особые символы в пароле нужно закодировать
+   (`node -e "console.log(encodeURIComponent('пароль'))"`).
+4. Вписать строку в `functions/.env` как `DATABASE_URL=...` и выполнить:
+   ```bash
+   cd functions && npm install && npm run db:setup
+   ```
 
-1. Запусти **Visual Studio Code**
-2. `File` → `Open Folder...` → выбери `C:\Users\ashgr\Desktop\ecommerce`
-3. Открой терминал: `` Ctrl + ` `` (или `View` → `Terminal`)
-4. Убедись что в терминале выбран **PowerShell** (вкладка справа от `+`)
+## 2. Сервер (Render) — один раз
 
-Все команды ниже — прямо в этом терминале, из корня `ecommerce`.
+1. render.com → **New + → Blueprint** → репозиторий `ecommerce-luxecart` (Render читает `render.yaml`).
+2. В поле **DATABASE_URL** вставить строку из шага 1. `JWT_SECRET` Render создаёт сам.
+3. Дождаться статуса **Live**. Проверка: `https://<имя>.onrender.com/api/health` → `{"status":"ok"}`.
+   Если имя сервиса занято, Render добавит суффикс (сейчас `luxecart-api-wxmk`) —
+   тогда поменять адрес в `frontend/.env.production`.
 
----
+Дальше каждый `git push` в `main` пересобирает сервер автоматически.
 
-## Шаг 1 — Node.js (если ещё нет)
+Если сервер не стартует — **Logs**: строка `Health check: database unavailable: ...` показывает,
+почему он не может подключиться к базе (чаще всего неверный `DATABASE_URL`).
 
-Скачай и установи: [nodejs.org](https://nodejs.org) → версия **LTS** (20.x или 24.x)
+## 3. Витрина (Firebase Hosting)
 
-Проверь:
-
-```powershell
-node --version
-npm --version
-```
-
----
-
-## GitHub-репозиторий
-
-```powershell
-git remote add origin https://github.com/Ashot-js/ecommerce-luxecart.git
-```
-
----
-
-## Шаг 2 — Firebase CLI (один раз)
-
-```powershell
-npm install -g firebase-tools
-```
-
----
-
-## Шаг 3 — вход в Firebase (один раз)
-
-```powershell
-firebase login
-```
-
-Откроется браузер → войди в Google-аккаунт, привязанный к `ecommerce-luxecart`.
-
----
-
-## Шаг 4 — установка зависимостей
-
-```powershell
+```bash
 cd frontend
 npm install
+npm run build              # берёт VITE_API_URL из .env.production
 cd ..
+npx firebase deploy --only hosting --project ecommerce-luxecart
+```
 
+## 4. Администратор
+
+1. Зарегистрироваться на сайте.
+2. `cd functions && npm run make-admin -- ваш@email` (с `DATABASE_URL` от Supabase в `.env`).
+3. Перезайти на сайт — появится ссылка на админ-панель (`/admin`).
+
+## Проверка после выкладки
+
+```bash
 cd functions
-npm install
-cd ..
+API_BASE=https://luxecart-api-wxmk.onrender.com/api npm run smoke
 ```
 
----
-
-## Шаг 5 — сборка фронтенда
-
-```powershell
-cd frontend
-npm run build          # TypeScript + Vite → папка dist/
-cd ..
-```
-
-Результат: `frontend\dist\` — готовая статика.
-
----
-
-## Шаг 6 — сборка бэкенда (функции)
-
-```powershell
-cd functions
-npm run build          # TypeScript → папка lib/
-cd ..
-```
-
-Результат: `functions\lib\` — скомпилированный JS.
-
----
-
-## Шаг 7 — деплой
-
-```powershell
-# Всё сразу: функции + хостинг
-firebase deploy
-```
-
-Или по отдельности:
-
-```powershell
-firebase deploy --only functions    # только бэкенд
-firebase deploy --only hosting      # только фронтенд
-```
-
----
-
-## Шаг 8 — открыть сайт
-
-```powershell
-firebase open hosting:site
-```
-
----
-
-## Шаг 9 — эмуляторы (тест локально, без деплоя)
-
-```powershell
-firebase emulators:start
-```
-
-|          | Адрес                   |
-| -------- | ----------------------- |
-| Фронтенд | `http://localhost:5000` |
-| API      | `http://localhost:5001` |
-
----
-
-## 📋 Шпаргалка — деплой за 3 команды
-
-```powershell
-cd frontend; npm install; npm run build; cd ..
-cd functions; npm install; npm run build; cd ..
-firebase deploy
-```
-
----
-
-## ⚠️ Перед деплоем проверь
-
-- [ ] `functions\.env` заполнен (`DATABASE_URL`, `JWT_SECRET`)
-- [ ] `frontend\.env` заполнен (Firebase-конфиг, если есть)
-- [ ] PostgreSQL доступен из облака
-- [ ] Схема БД накатана: `node run_schema.js`
-
----
-
-## 📊 Оптимизация проекта
-
-### Build оптимизация (Vite)
-
-- ✅ Terser minification (удаление console/debugger)
-- ✅ Код splitting (vendor, ui, redux бандлы)
-- ✅ Sourcemaps отключены в production
-- ✅ Lazy loading всех страниц (React.lazy + Suspense)
-
-### Bundle анализ
-
-```powershell
-cd frontend
-npm run build       # Показывает размер бандла
-npm run preview     # Локальный preview production
-```
-
-### Удаление неиспользуемого
-
-**Для очистки проекта от node_modules:**
-
-```powershell
-rm frontend/node_modules -Recurse -Force
-rm functions/node_modules -Recurse -Force
-npm ci --prefix frontend
-npm ci --prefix functions
-```
-
-### Performance советы
-
-- 🚀 Images: используй `loading="lazy"` (уже есть в Cart.tsx)
-- 🚀 CSS: сжимается автоматически в build
-- 🚀 API: используй RTK Query кэширование (уже есть)
-- 🚀 Code splitting: route-based lazy loading активно
+Проверка создаёт двух тестовых пользователей (`smoke-…@example.com`, `admin-…@example.com`) и один заказ —
+удалите их после (пользователи удаляются вместе с заказами).
