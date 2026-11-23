@@ -1,0 +1,37 @@
+name: Keep database awake
+
+# Бесплатная база Supabase засыпает после недели без запросов.
+# Раз в 3 дня читаем список товаров: запрос будит сервер Render и обращается к базе.
+on:
+  schedule:
+    - cron: '17 6 */3 * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/keep-alive.yml']
+
+permissions:
+  actions: write
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Read products
+        run: |
+          url=https://luxecart-api-wxmk.onrender.com/api/products
+          for attempt in 1 2 3 4 5 6; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 90 "$url" || true)
+            echo "Attempt $attempt: HTTP $code"
+            if [ "$code" = "200" ]; then exit 0; fi
+            sleep 20
+          done
+          exit 1
+
+      # GitHub отключает расписание после 60 дней без изменений в репозитории.
+      - name: Keep this schedule enabled
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method PUT "repos/$GITHUB_REPOSITORY/actions/workflows/keep-alive.yml/enable"
